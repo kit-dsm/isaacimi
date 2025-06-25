@@ -1,0 +1,24 @@
+app:
+  headless: false
+  renderer: RayTracedLighting
+
+world:
+  stage_units_in_meters: 1.0
+  physics_dt: 0.0166
+  rendering_dt: 0.0166
+
+scene:
+  environment_usd_path: /Isaac/Environments/Grid/default_environment.usd # to-do
+  robots:
+    - name: dummy1
+      usd_path: /home/fl2644/KIT/evorobot-isaacsim/dummy.usd # to-do
+      position: [0, 0, 0]
+      orientation: [0, 0, 0]
+
+
+
+
+
+
+
+
