@@ -33,9 +33,23 @@ if assets_root_path is None:
     sys.exit()
 
 from isaacsim.core.utils.stage import add_reference_to_stage
-add_reference_to_stage(usd_path=assets_root_path+scene_config["scene"]["environment_usd_path"], prim_path="/World/Environment")
+add_reference_to_stage(usd_path=assets_root_path+scene_config["scene"]["environment"]["usd_path"], prim_path=scene_config["scene"]["environment"]["prim_path"])
 
-for robot in scene_config["scene"]["robots"]:
-    print("spawning robot")
+import numpy as np
+from custom_utils import RosRobot
+for robot_config in scene_config["scene"]["robots"]:
+    world.scene.add(RosRobot(
+        robot_config["prim_path"],
+        robot_config["name"],
+        robot_config["usd_path"],
+        np.array(robot_config["position"]),
+        np.array(robot_config["orientation"])
+        # to-do: articulation controller
+    ))
+
+world.reset()
+
+while simulation_app.is_running():
+    world.step(render=True)
 
 simulation_app.close()
