@@ -26,7 +26,9 @@ world.set_simulation_dt(physics_dt=scene_config["world"]["physics_dt"], renderin
 from isaacsim.core.utils.extensions import enable_extension
 enable_extension("isaacsim.ros2.bridge")
 
+import rclpy
 import omni.graph.core as og
+rclpy.init()
 try:
     og.Controller.edit(
         {"graph_path": "/ActionGraph", "evaluator_name": "execution"},
@@ -62,19 +64,22 @@ add_reference_to_stage(usd_path=assets_root_path+scene_config["scene"]["environm
 
 import numpy as np
 from custom_utils import RosRobot
+robots = []
 for robot_config in scene_config["scene"]["robots"]:
-    world.scene.add(RosRobot(
+    robots.append(world.scene.add(RosRobot(
         robot_config["prim_path"],
         robot_config["name"],
         robot_config["usd_path"],
         np.array(robot_config["position"]),
         np.array(robot_config["orientation"])
         # to-do: articulation controller
-    ))
+    )))
 
 world.reset()
 
 while simulation_app.is_running():
+    for robot in robots:
+        robot.post_step()
     world.step(render=True)
 
 simulation_app.close()
