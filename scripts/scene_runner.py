@@ -23,6 +23,31 @@ from isaacsim.core.api import World
 world = World(scene_config["world"]["stage_units_in_meters"])
 world.set_simulation_dt(physics_dt=scene_config["world"]["physics_dt"], rendering_dt=scene_config["world"]["rendering_dt"])
 
+from isaacsim.core.utils.extensions import enable_extension
+enable_extension("isaacsim.ros2.bridge")
+
+import omni.graph.core as og
+try:
+    og.Controller.edit(
+        {"graph_path": "/ActionGraph", "evaluator_name": "execution"},
+        {
+            og.Controller.Keys.CREATE_NODES: [
+                ("ReadSimTime", "isaacsim.core.nodes.IsaacReadSimulationTime"),
+                ("OnPlaybackTick", "omni.graph.action.OnPlaybackTick"),
+                ("PublishClock", "isaacsim.ros2.bridge.ROS2PublishClock"),
+            ],
+            og.Controller.Keys.CONNECT: [
+                ("OnPlaybackTick.outputs:tick", "PublishClock.inputs:execIn"), # Connecting execution of OnPlaybackTick node to PublishClock to automatically publish each frame
+                ("ReadSimTime.outputs:simulationTime", "PublishClock.inputs:timeStamp"), # Connecting simulationTime data of ReadSimTime to PublishClock node
+            ],
+            og.Controller.Keys.SET_VALUES: [
+                ("PublishClock.inputs:topicName", "/clock"), # Assigning topic name to PublishClock node
+            ],
+        },
+    )
+except Exception as e:
+    print(e)
+
 import carb
 import sys
 from isaacsim.storage.native import get_assets_root_path
