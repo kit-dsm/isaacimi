@@ -60,7 +60,7 @@ class ImiRobot(BaseTask):
     
     def _get_ros_node(self) -> Node:
         if self._ros_node is None:
-            self.ros_node = rclpy.create_node(self._robot_name + "_node")
+            self._ros_node = rclpy.create_node(self._robot_name + "_node")
         return self._ros_node
             
     def add_ros_subscriber(
@@ -72,7 +72,7 @@ class ImiRobot(BaseTask):
         *,
         callback_group: Optional['CallbackGroup'] = None,
     ) -> 'Subscription':
-        return self._get_ros_node().create_subscription(msg_type, topic, callback, qos_profile)
+        return self._get_ros_node().create_subscription(msg_type, f"/{self._robot_name}/{topic}", callback, qos_profile, callback_group=callback_group)
 
     def add_ros_publisher(
         self,
@@ -80,4 +80,4 @@ class ImiRobot(BaseTask):
         topic: str,
         qos_profile: Union['QoSProfile', int],
     ) -> 'Publisher':
-        return self._get_ros_node().create_publisher(msg_type, topic, qos_profile)
+        return self._get_ros_node().create_publisher(msg_type, f"/{self._robot_name}/{topic}", qos_profile)
