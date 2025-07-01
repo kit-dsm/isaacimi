@@ -63,32 +63,32 @@ from isaacsim.core.utils.stage import add_reference_to_stage
 add_reference_to_stage(usd_path=assets_root_path+scene_config["scene"]["environment"]["usd_path"], prim_path=scene_config["scene"]["environment"]["prim_path"])
 
 import numpy as np
-# from custom_utils import RosRobot
 from isaacimi import ImiRobot
-# robots = []
-for robot_config in scene_config["scene"]["robots"]:
-    # robots.append(world.scene.add(RosRobot(
-    #     robot_config["prim_path"],
-    #     robot_config["name"],
-    #     robot_config["usd_path"],
-    #     np.array(robot_config["position"]),
-    #     np.array(robot_config["orientation"])
-    #     # to-do: articulation controller
-    # )))
+from isaacimi.utils import get_task_from_file # todo
 
-    world.add_task(ImiRobot(
-        robot_config["prim_path"],
-        robot_config["name"],
-        robot_config["usd_path"],
-        np.array(robot_config["position"]),
-        np.array(robot_config["orientation"])
-    ))
+for robot_config in scene_config["scene"]["robots"]:
+    addons = robot_config.get("addons")
+    if addons is not None:
+        UserDefinedTask = get_task_from_file(addons["custom_task"])
+        world.add_task(UserDefinedTask(
+            robot_config["prim_path"],
+            robot_config["name"],
+            robot_config["usd_path"],
+            np.array(robot_config["position"]),
+            np.array(robot_config["orientation"])
+        ))
+    else:
+        world.add_task(ImiRobot(
+            robot_config["prim_path"],
+            robot_config["name"],
+            robot_config["usd_path"],
+            np.array(robot_config["position"]),
+            np.array(robot_config["orientation"])
+        ))
 
 world.reset()
 
 while simulation_app.is_running():
-    # for robot in robots:
-    #     robot.post_step()
     world.step(render=True)
 
 simulation_app.close()
