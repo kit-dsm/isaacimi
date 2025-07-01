@@ -25,7 +25,7 @@ class ImiRobot(BaseTask):
         self._robot_initial_orientation = orientation
         return
     
-    def set_up_scene(self, scene: Scene):
+    def set_up_scene(self, scene: Scene) -> None:
         super().set_up_scene(scene)
         add_reference_to_stage(usd_path=self._robot_usd_path, prim_path=self._robot_prim_path)
         self.set_robot()
@@ -35,3 +35,11 @@ class ImiRobot(BaseTask):
         if self._robot is None:
             self._robot = Robot(prim_path=self._robot_prim_path, name=self._robot_name, position=self._robot_initial_position, orientation=self._robot_initial_orientation, articulation_controller=None)
         return self._robot
+    
+    def post_reset(self) -> None:
+        # maybe: get the user to optionally implement Robot class
+        # self._robot.post_reset()
+        self._robot.set_angular_velocity(np.array([0, 0, 0]))
+        self._robot.set_linear_velocity(np.array([0, 0, 0]))
+        self._robot.set_local_pose(self._robot_initial_position, self._robot_initial_orientation)
+        return
