@@ -88,7 +88,16 @@ for robot_config in scene_config["scene"]["robots"]:
 
 world.reset()
 
+i = 0
+reset_needed = False
 while simulation_app.is_running():
     world.step(render=True)
+    if world.is_stopped() and not reset_needed:
+        reset_needed = True
+    if world.is_playing():
+        if reset_needed:
+            world.reset()
+            reset_needed = False
+        i += 1
 
 simulation_app.close()
