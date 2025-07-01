@@ -39,6 +39,7 @@ class ImiRobot(BaseTask):
         super().set_up_scene(scene)
         add_reference_to_stage(usd_path=self._robot_usd_path, prim_path=self._robot_prim_path)
         self.set_robot()
+        scene.add(self._robot) # needs to be called to create a Physics Simulation View and initialize Articulation
         return
     
     def set_robot(self) -> Robot:
@@ -47,15 +48,12 @@ class ImiRobot(BaseTask):
         return self._robot
     
     def post_reset(self) -> None:
-        # maybe: get the user to optionally implement Robot class
-        # self._robot.post_reset()
-        self._robot.set_angular_velocity(np.array([0, 0, 0]))
-        self._robot.set_linear_velocity(np.array([0, 0, 0]))
-        self._robot.set_local_pose(self._robot_initial_position, self._robot_initial_orientation)
+        self._robot.post_reset()
         return
     
     def pre_step(self, time_step_index: int, simulation_time: float) -> None:
-        # todo
+        rclpy.spin_once(self._ros_node, timeout_sec=0)
+        self.custom_pre_step()
         return
     
     def _get_ros_node(self) -> Node:
@@ -81,3 +79,6 @@ class ImiRobot(BaseTask):
         qos_profile: Union['QoSProfile', int],
     ) -> 'Publisher':
         return self._get_ros_node().create_publisher(msg_type, f"/{self._robot_name}/{topic}", qos_profile)
+    
+    def custom_pre_step() -> None:
+        return
