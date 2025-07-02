@@ -12,6 +12,11 @@ import yaml
 with open(args.config, 'r') as scene_config_file:
     scene_config = yaml.safe_load(scene_config_file)
 
+# from cerberus import Validator
+# schema = {
+#     "name": {"type": "string"}
+# }
+
 from isaacsim import SimulationApp
 app_config = {
     "headless": scene_config["app"]["headless"],
