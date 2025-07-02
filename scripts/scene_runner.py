@@ -8,14 +8,94 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
+
 import yaml
 with open(args.config, 'r') as scene_config_file:
     scene_config = yaml.safe_load(scene_config_file)
 
-# from cerberus import Validator
-# schema = {
-#     "name": {"type": "string"}
-# }
+import sys
+import carb
+from cerberus import Validator
+schema = {
+    "app": {
+        "type": "dict",
+        "required": True,
+        "schema": {
+            "headless": {"type": "boolean", "required": True},
+            "renderer": {
+                "type": "string",
+                "allowed": ["RayTracedLighting", "PathTracing"],
+                "required": True
+            }
+        },
+    },
+    "world": {
+        "type": "dict",
+        "required": True,
+        "schema": {
+            "stage_units_in_meters": {"type": "float", "required": True},
+            "physics_dt": {"type": "float", "required": True},
+            "rendering_dt": {"type": "float", "required": True}
+        },
+    },
+    "scene": {
+        "type": "dict",
+        "required": True,
+        "schema": {
+            "environment": {
+                "type": "dict",
+                "required": True,
+                "schema": {
+                    "usd_path": {"type": "string", "required": True},
+                    "prim_path": {"type": "string", "required": True},
+                },
+            },
+            "robots": {
+                "type": "list",
+                "required": True,
+                "schema": {
+                    "type": "dict",
+                    "schema": {
+                        "name": {"type": "string", "required": True},
+                        "usd_path": {"type": "string", "required": True},
+                        "prim_path": {"type": "string", "required": True},
+                        "position": {
+                            "type": "list",
+                            "required": True,
+                            "schema": {"type": "float"},
+                            "minlength": 3,
+                            "maxlength": 3,
+                        },
+                        "orientation": {
+                            "type": "list",
+                            "required": True,
+                            "schema": {"type": "float"},
+                            "minlength": 4,
+                            "maxlength": 4,
+                        },
+                        "plugin": {"type": "string", "required": False},  # optional
+                    },
+                },
+            },
+        },
+    },
+    "robot_plugins": {
+        "type": "list",
+        "required": False,
+        "schema": {
+            "type": "dict",
+            "schema": {
+                "name": {"type": "string", "required": True},
+                "filepath": {"type": "string", "required": True},
+            },
+        },
+    },
+}
+v = Validator(schema)
+if not v.validate(scene_config):
+    carb.log_error(f"The provided config file is invalid: {v.errors}")
+    sys.exit(1)
+
 
 from isaacsim import SimulationApp
 app_config = {
@@ -56,7 +136,6 @@ except Exception as e:
     print(e)
 
 import carb
-import sys
 from isaacsim.storage.native import get_assets_root_path
 assets_root_path = get_assets_root_path()
 if assets_root_path is None:
