@@ -18,11 +18,11 @@ scene:
       position: [0, 0, 0]
       orientation: [1, 0, 0, 0] # quaternion
       addons:
-        custom_task: /home/fl2644/KIT/imi-isaacsim-env/test/dummy_task.py
+        custom_task: /home/fl2644/KIT/imi-isaacsim-env/examples/dummy_task.py
     - name: dummy2
       usd_path: /home/fl2644/KIT/evorobot-isaacsim/dummy.usd # to-do
       prim_path: /World/dummy2
       position: [1.5, 1.5, 0]
       orientation: [1, 0, 0, 0] # quaternion
       addons:
-        custom_task: /home/fl2644/KIT/imi-isaacsim-env/test/dummy_task.py
+        custom_task: /home/fl2644/KIT/imi-isaacsim-env/examples/dummy_task.py
