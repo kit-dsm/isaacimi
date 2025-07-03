@@ -1,11 +1,11 @@
-from isaacimi import ImiRobot
+from isaacimi.imi_robot import ImiRobot
 
 from geometry_msgs.msg import Twist
 from std_msgs.msg import Int8
 
 import numpy as np
 
-class DummyTask(ImiRobot):
+class DummyRobotPlugin(ImiRobot):
     def __init__(
         self,
         prim_path,
