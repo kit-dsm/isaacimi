@@ -122,11 +122,11 @@ if assets_root_path is None:
     sys.exit(1)
 
 
-from isaacimi.imi_robot import ImiRobot
+from isaacimi.robot_plugin import ImiRobotPlugin
 from isaacimi.utils import load_subclasses_from_file
-robot_plugins: Dict[str, Type[ImiRobot]] = dict()
+robot_plugins: Dict[str, Type[ImiRobotPlugin]] = dict()
 for entry in scene_config.get("robot_plugins", []):
-    plugins = load_subclasses_from_file(entry["filepath"], ImiRobot, allowed_names=entry["classes"])
+    plugins = load_subclasses_from_file(entry["filepath"], ImiRobotPlugin, allowed_names=entry["classes"])
     robot_plugins.update(plugins)
 carb.log_info(f"User defined robot_plugins: {robot_plugins}")
 
@@ -181,7 +181,7 @@ for robot_config in scene_config["scene"]["robots"]:
             np.array(robot_config["orientation"])
         ))
     else:
-        world.add_task(ImiRobot(
+        world.add_task(ImiRobotPlugin(
             robot_config["prim_path"],
             robot_config["name"],
             robot_config["usd_path"],

@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from rclpy.subscription import Subscription
     from rclpy.publisher import Publisher
 
-class ImiRobot(BaseTask):
+class ImiRobotPlugin(BaseTask):
     def __init__(
         self,
         prim_path: str,
