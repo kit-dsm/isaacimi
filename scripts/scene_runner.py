@@ -1,3 +1,6 @@
+from typing import Dict, Type, List
+
+
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -12,6 +15,7 @@ args = parser.parse_args()
 import yaml
 with open(args.config, 'r') as scene_config_file:
     scene_config = yaml.safe_load(scene_config_file)
+
 
 import sys
 import carb
@@ -85,8 +89,12 @@ schema = {
         "schema": {
             "type": "dict",
             "schema": {
-                "name": {"type": "string", "required": True},
                 "filepath": {"type": "string", "required": True},
+                "classes": {
+                    "type": "list",
+                    "required": True,
+                    'schema': {'type': 'string', 'empty': False},
+                },
             },
         },
     },
@@ -97,6 +105,7 @@ if not v.validate(scene_config):
     sys.exit(1)
 
 
+# The SimulationApp needs to start before importing any packages from isaac.core, otherwise a ModuleNotFoundError is raised
 from isaacsim import SimulationApp
 app_config = {
     "headless": scene_config["app"]["headless"],
@@ -104,12 +113,32 @@ app_config = {
 }
 simulation_app = SimulationApp(app_config)
 
+
+from isaacsim.storage.native import get_assets_root_path
+assets_root_path = get_assets_root_path()
+if assets_root_path is None:
+    carb.log_error("Could not find Isaac Sim assets folder")
+    simulation_app.close()
+    sys.exit(1)
+
+
+from isaacimi.imi_robot import ImiRobot
+from isaacimi.utils import load_subclasses_from_file
+robot_plugins: Dict[str, Type[ImiRobot]] = dict()
+for entry in scene_config.get("robot_plugins", []):
+    plugins = load_subclasses_from_file(entry["filepath"], ImiRobot, allowed_names=entry["classes"])
+    robot_plugins.update(plugins)
+carb.log_info(f"User defined robot_plugins: {robot_plugins}")
+
+
 from isaacsim.core.api import World
 world = World(scene_config["world"]["stage_units_in_meters"])
 world.set_simulation_dt(physics_dt=scene_config["world"]["physics_dt"], rendering_dt=scene_config["world"]["rendering_dt"])
 
+
 from isaacsim.core.utils.extensions import enable_extension
 enable_extension("isaacsim.ros2.bridge")
+
 
 import rclpy
 import omni.graph.core as og
@@ -135,26 +164,16 @@ try:
 except Exception as e:
     print(e)
 
-import carb
-from isaacsim.storage.native import get_assets_root_path
-assets_root_path = get_assets_root_path()
-if assets_root_path is None:
-    carb.log_error("Could not find Isaac Sim assets folder")
-    simulation_app.close()
-    sys.exit()
 
 from isaacsim.core.utils.stage import add_reference_to_stage
 add_reference_to_stage(usd_path=assets_root_path+scene_config["scene"]["environment"]["usd_path"], prim_path=scene_config["scene"]["environment"]["prim_path"])
 
-import numpy as np
-from isaacimi import ImiRobot
-from isaacimi.utils import get_task_from_file # todo
 
+import numpy as np
 for robot_config in scene_config["scene"]["robots"]:
-    addons = robot_config.get("addons")
-    if addons is not None:
-        UserDefinedTask = get_task_from_file(addons["custom_task"])
-        world.add_task(UserDefinedTask(
+    plugin_name = robot_config.get("plugin")
+    if plugin_name is not None:
+        world.add_task(robot_plugins[plugin_name](
             robot_config["prim_path"],
             robot_config["name"],
             robot_config["usd_path"],
@@ -170,7 +189,9 @@ for robot_config in scene_config["scene"]["robots"]:
             np.array(robot_config["orientation"])
         ))
 
+
 world.reset()
+
 
 i = 0
 reset_needed = False
