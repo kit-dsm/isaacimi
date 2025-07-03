@@ -17,13 +17,14 @@ scene:
       prim_path: /World/dummy1
       position: [0, 0, 0]
       orientation: [1, 0, 0, 0] # quaternion
-      plugin: DummyRobotPlugin
+      plugin: DummyRobotPlugin # optional plugin
     - name: dummy2
-      usd_path: /home/fl2644/KIT/evorobot-isaacsim/dummy.usd # to-do
+      usd_path: /home/fl2644/KIT/evorobot-isaacsim/dummy.usd
       prim_path: /World/dummy2
       position: [1.5, 1.5, 0]
-      orientation: [1, 0, 0, 0] # quaternion
+      orientation: [1, 0, 0, 0]
 
 robot_plugins:
-  - name: DummyRobotPlugin
-    filepath: /home/fl2644/KIT/imi-isaacsim-env/examples/dummy_task.py
+  - filepath: /home/fl2644/KIT/imi-isaacsim-env/examples/dummy_robot_plugin.py
+    classes:
+      - DummyRobotPlugin
