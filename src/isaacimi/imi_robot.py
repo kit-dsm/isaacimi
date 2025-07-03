@@ -52,7 +52,8 @@ class ImiRobot(BaseTask):
         return
     
     def pre_step(self, time_step_index: int, simulation_time: float) -> None:
-        rclpy.spin_once(self._ros_node, timeout_sec=0)
+        if self._ros_node is not None:
+            rclpy.spin_once(self._ros_node, timeout_sec=0)
         self.custom_pre_step()
         return
     
@@ -80,5 +81,5 @@ class ImiRobot(BaseTask):
     ) -> 'Publisher':
         return self._get_ros_node().create_publisher(msg_type, f"/{self._robot_name}/{topic}", qos_profile)
     
-    def custom_pre_step() -> None:
+    def custom_pre_step(self) -> None:
         return
