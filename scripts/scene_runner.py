@@ -170,24 +170,38 @@ add_reference_to_stage(usd_path=assets_root_path+scene_config["scene"]["environm
 
 
 import numpy as np
+from isaacimi.imi_robot import ImiRobot
+from isaacimi.robot_task import ImiRobotTask
 for robot_config in scene_config["scene"]["robots"]:
-    plugin_name = robot_config.get("plugin")
-    if plugin_name is not None:
-        world.add_task(robot_plugins[plugin_name](
-            robot_config["prim_path"],
-            robot_config["name"],
-            robot_config["usd_path"],
-            np.array(robot_config["position"]),
-            np.array(robot_config["orientation"])
-        ))
-    else:
-        world.add_task(ImiRobotPlugin(
-            robot_config["prim_path"],
-            robot_config["name"],
-            robot_config["usd_path"],
-            np.array(robot_config["position"]),
-            np.array(robot_config["orientation"])
-        ))
+    robot = ImiRobot(
+        robot_config["prim_path"],
+        robot_config["name"],
+        robot_config["usd_path"],
+        np.array(robot_config["position"]),
+        np.array(robot_config["orientation"])
+    )
+    robot_task = ImiRobotTask(robot)
+    
+    for plugin_name in robot_config.get("plugins", []):
+        robot_task.add_plugin(robot_plugins[plugin_name]())
+
+    # if plugin_name is not None:
+    #     world.add_task(robot_plugins[plugin_name](
+    #         robot_config["prim_path"],
+    #         robot_config["name"],
+    #         robot_config["usd_path"],
+    #         np.array(robot_config["position"]),
+    #         np.array(robot_config["orientation"])
+    #     ))
+    # else:
+    #     world.add_task(ImiRobotPlugin(
+    #         robot_config["prim_path"],
+    #         robot_config["name"],
+    #         robot_config["usd_path"],
+    #         np.array(robot_config["position"]),
+    #         np.array(robot_config["orientation"])
+    #     ))
+    world.add_physics_callback(f"{robot_task.name}_physics_callback", robot_task.on_physics_step)
 
 
 world.reset()
