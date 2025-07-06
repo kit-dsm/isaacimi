@@ -17,12 +17,10 @@ class ImiRobot(Robot):
         self._usd_path = usd_path
         self._initial_translation = translation
         self._initial_orientation = orientation
-        # self._ros_node = None # todo
         add_reference_to_stage(usd_path=self._usd_path, prim_path=self._prim_path)
         super().__init__(prim_path=self._prim_path, name=self._name, position=self._initial_translation, orientation=self._initial_orientation, articulation_controller=None)
         return
 
-    def get_name(self) -> str:
+    @property
+    def name(self) -> str:
         return self._name
-    
-        
