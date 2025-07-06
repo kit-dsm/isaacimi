@@ -146,7 +146,6 @@ enable_extension("isaacsim.ros2.bridge")
 
 import rclpy
 import omni.graph.core as og
-rclpy.init()
 try:
     og.Controller.edit(
         {"graph_path": "/ActionGraph", "evaluator_name": "execution"},
@@ -194,9 +193,11 @@ for robot_config in scene_config["scene"]["robots"]:
 world.reset()
 
 
+from isaacimi.ros_manager import RosManager
 i = 0
 reset_needed = False
 while simulation_app.is_running():
+    RosManager.spin_once()
     world.step(render=True)
     if world.is_stopped() and not reset_needed:
         reset_needed = True
