@@ -77,7 +77,11 @@ schema = {
                             "minlength": 4,
                             "maxlength": 4,
                         },
-                        "plugin": {"type": "string", "required": False},  # optional
+                        "plugins": { # optional plugins
+                            "type": "list",
+                            "required": False,
+                            "schema": {"type": "string"}    
+                        },
                     },
                 },
             },
