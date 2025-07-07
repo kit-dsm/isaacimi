@@ -169,7 +169,7 @@ except Exception as e:
 
 
 from isaacsim.core.utils.stage import add_reference_to_stage
-add_reference_to_stage(usd_path=assets_root_path+scene_config["scene"]["environment"]["usd_path"], prim_path=scene_config["scene"]["environment"]["prim_path"])
+add_reference_to_stage(usd_path=scene_config["scene"]["environment"]["usd_path"], prim_path=scene_config["scene"]["environment"]["prim_path"])
 
 
 import numpy as np

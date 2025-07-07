@@ -9,7 +9,7 @@ world:
 
 scene:
   environment:
-    usd_path: /Isaac/Environments/Grid/default_environment.usd # TODO: asset storage system
+    usd_path: /home/fl2644/KIT/imi-isaacsim-env/examples/environments/cone_cylinder_cube.usd # TODO: asset storage system
     prim_path: /World/environment
   robots:
     - name: dummy1
