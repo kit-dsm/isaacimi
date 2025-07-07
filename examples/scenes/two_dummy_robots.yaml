@@ -27,7 +27,7 @@ scene:
       orientation: [1, 0, 0, 0]
 
 robot_plugins:
-  - filepath: /home/fl2644/KIT/imi-isaacsim-env/examples/robots/dummy_robot/dummy_robot_plugin.py
+  - filepath: /home/fl2644/KIT/imi-isaacsim-env/examples/robots/dummy_robot/dummy_robot_plugins.py
     classes:
       - DummyRobotControllerPlugin
       - DummyRobotLidarPlugin
