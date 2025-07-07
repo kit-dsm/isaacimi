@@ -17,8 +17,9 @@ scene:
       prim_path: /World/dummy1
       position: [0, 0, 0]
       orientation: [1, 0, 0, 0] # quaternion
-      plugins:
-        - DummyRobotPlugin # optional plugin
+      plugins: # optional plugins
+        - DummyRobotControllerPlugin
+        - DummyRobotLidarPlugin
     - name: dummy2
       usd_path: /home/fl2644/KIT/imi-isaacsim-env/examples/robots/dummy_robot/dummy_robot.usd
       prim_path: /World/dummy2
@@ -28,4 +29,5 @@ scene:
 robot_plugins:
   - filepath: /home/fl2644/KIT/imi-isaacsim-env/examples/robots/dummy_robot/dummy_robot_plugin.py
     classes:
-      - DummyRobotPlugin
+      - DummyRobotControllerPlugin
+      - DummyRobotLidarPlugin
