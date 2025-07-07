@@ -1,6 +1,7 @@
 import rclpy
 from rclpy.executors import MultiThreadedExecutor
 from rclpy.node import Node
+from rclpy.parameter import Parameter
 
 class RosManager:
     _nodes = {}
@@ -18,6 +19,9 @@ class RosManager:
             cls._rclpy_init = True
         if robot_name not in cls._nodes:
             node = Node(f"{robot_name}_node")
+            node.set_parameters([
+                Parameter('use_sim_time', Parameter.Type.BOOL, True)
+            ])
             cls._executor.add_node(node)
             cls._nodes[robot_name] = node
         return cls._nodes[robot_name]
