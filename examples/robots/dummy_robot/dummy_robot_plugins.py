@@ -4,6 +4,7 @@ from geometry_msgs.msg import Twist
 from std_msgs.msg import Int8
 from nav_msgs.msg import Odometry
 from rclpy.time import Time
+from geometry_msgs.msg import Quaternion
 
 import numpy as np
 import math
@@ -54,25 +55,20 @@ class DummyRobotControllerPlugin(ImiRobotPlugin):
         nanoseconds = int((simulation_time - seconds) * 1e9)
         odom_msg.header.stamp = Time(seconds=seconds, nanoseconds=nanoseconds).to_msg() # you can also do self.ros_node.get_clock().now().to_msg() which will
                                                                                         # return the world time. If you set the node parameter use_sim_time 
-                                                                                        # to true it will return the simulated time. By default, use_sim_time is true.
+                                                                                        # to true it will return the simulated time. By default, use_sim_time is false
+                                                                                        # by default, but for all plugins it has been set to true.
         odom_msg.header.frame_id = "odom"
         odom_msg.child_frame_id  = "base_footprint"
 
-        # this section is incorrect
-        position_increment = self.lin_vel_cmd * dt
-        orientation_increment = self.ang_vel_cmd * dt
-
         curr_odom_yaw = self.odom_pose[2]
-        self.odom_pose[0] += math.cos(curr_odom_yaw) * position_increment[0] - math.sin(curr_odom_yaw) - position_increment[1] # x
-        self.odom_pose[1] += math.sin(curr_odom_yaw) * position_increment[0] + math.cos(curr_odom_yaw) - position_increment[1] # y
-        self.odom_pose[2] += orientation_increment[2] # yaw
-        # --------
-
+        self.odom_pose[0] += (math.cos(curr_odom_yaw) * self.lin_vel_cmd[0] - math.sin(curr_odom_yaw) * self.lin_vel_cmd[1]) * dt # x
+        self.odom_pose[1] += (math.sin(curr_odom_yaw) * self.lin_vel_cmd[0] + math.cos(curr_odom_yaw) * self.lin_vel_cmd[1]) * dt # y
+        self.odom_pose[2] = wrap_angle_rad(self.odom_pose[2] + self.ang_vel_cmd[2] * dt) # yaw
+        
         odom_msg.pose.pose.position.x = float(self.odom_pose[0])
         odom_msg.pose.pose.position.y = float(self.odom_pose[1])
-        odom_msg.pose.pose.orientation = yaw_to_ros_quaternion(self.odom_pose[2])
-
-        print(f"dt: {dt}, odom_pose(rpy): {self.odom_pose}, position increment: {position_increment}, orientation_increment{orientation_increment}, yaw {self.odom_pose[2]}")
+        odom_orientation_q = yaw_to_quaternion(self.odom_pose[2])
+        odom_msg.pose.pose.orientation = Quaternion(w=odom_orientation_q[0], x=odom_orientation_q[1], y=odom_orientation_q[2], z=odom_orientation_q[3])
 
         odom_msg.twist.twist.linear.x = float(self.lin_vel_cmd[0])
         odom_msg.twist.twist.linear.y = float(self.lin_vel_cmd[1])
@@ -99,15 +95,19 @@ class DummyRobotControllerPlugin(ImiRobotPlugin):
 
         if self.lift_direction == 0:
             self.lift_active = False
-            # set_linear_velocity and set_angular_velocity methods assume the input is in the parent frame
-            # incoming messages in /cmd_vel are in the child (robot) frame, so we need to convert it to the parent frame
-            _, orientation = robot.get_world_pose()
-            rotation_matrix = quaternion_rotation_matrix(orientation)
-            lin_vel_cmd_rotated = rotation_matrix.dot(self.lin_vel_cmd)
-            ang_vel_cmd_rotated = rotation_matrix.dot(self.ang_vel_cmd)
 
-            robot.set_linear_velocity(lin_vel_cmd_rotated)
-            robot.set_angular_velocity(ang_vel_cmd_rotated)
+            # I had trouble using robot.set_angular_velocity() and robot.set_linear_velocity()
+            # It doesn't directly set the velocity of the robot in the world - I believe it accounts
+            # for physics (friction, mass, gravity)
+            # To simplify things, I just set the position of the cube in the world
+            position, orientation = robot.get_world_pose()
+
+            orientation_as_matrix = quaternion_rotation_matrix(orientation)
+            lin_vel_cmd_rotated = orientation_as_matrix.dot(self.lin_vel_cmd)
+
+            position += lin_vel_cmd_rotated * step_size
+            orientation = quaternion_multiply(orientation, rpy_to_quaternion(self.ang_vel_cmd * step_size))
+            robot.set_world_pose(position, orientation)
         else:
             self.lift_active = True
             if self.lift_direction > 0:
@@ -140,13 +140,43 @@ def quaternion_rotation_matrix(Q):
                            [r20, r21, r22]])            
     return rot_matrix
 
-from geometry_msgs.msg import Quaternion
-def yaw_to_ros_quaternion(yaw):
-    q = Quaternion()
-    q.z = math.sin(yaw / 2.0)
-    q.w = math.cos(yaw / 2.0)
-    return q
+def wrap_angle_rad(angle_rad):
+    return ((angle_rad + math.pi) % (2 * math.pi)) - math.pi
 
+def yaw_to_quaternion(yaw):
+    return np.array([math.cos(yaw / 2.0), 0, 0, math.sin(yaw / 2.0)])
+
+def rpy_to_quaternion(rpy):
+    """
+    Convert roll, pitch, yaw to quaternion using numpy arrays.
+
+    Args:
+        rpy: np.array of shape (3,) -> [roll, pitch, yaw] in radians
+
+    Returns:
+        np.array of shape (4,) -> [x, y, z, w] quaternion
+    """
+    roll, pitch, yaw = rpy
+    cy = np.cos(yaw * 0.5)
+    sy = np.sin(yaw * 0.5)
+    cp = np.cos(pitch * 0.5)
+    sp = np.sin(pitch * 0.5)
+    cr = np.cos(roll * 0.5)
+    sr = np.sin(roll * 0.5)
+    w = cr * cp * cy + sr * sp * sy
+    x = sr * cp * cy - cr * sp * sy
+    y = cr * sp * cy + sr * cp * sy
+    z = cr * cp * sy - sr * sp * cy
+    return np.array([w, x, y, z])
+
+def quaternion_multiply(q1, q2): # result is q2 * q1
+    w1, x1, y1, z1 = q1
+    w2, x2, y2, z2 = q2
+    w = w2*w1 - x2*x1 - y2*y1 - z2*z1
+    x = w2*x1 + x2*w1 + y2*z1 - z2*y1
+    y = w2*y1 - x2*z1 + y2*w1 + z2*x1
+    z = w2*z1 + x2*y1 - y2*x1 + z2*w1
+    return np.array([w, x, y, z])
 
 import omni
 from pxr import Gf
