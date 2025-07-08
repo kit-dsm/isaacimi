@@ -1,10 +1,10 @@
 from isaacimi.robot_plugin import ImiRobotPlugin
 
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg import Twist, Quaternion, TransformStamped
 from std_msgs.msg import Int8
 from nav_msgs.msg import Odometry
 from rclpy.time import Time
-from geometry_msgs.msg import Quaternion
+from tf2_ros import TransformBroadcaster
 
 import numpy as np
 import math
@@ -26,6 +26,8 @@ class DummyRobotControllerPlugin(ImiRobotPlugin):
 
         self.odom_pub = self.ros_node.create_publisher(Odometry, "odom", 1)
         self.odom_pose = np.zeros(3) # only keep track of x, y, yaw
+
+        self.tf_odom_broadcaster = TransformBroadcaster(self.ros_node)
 
         self.pre_step_time = 0 # used to calculate step size in pre_physics_step
         return
@@ -87,6 +89,19 @@ class DummyRobotControllerPlugin(ImiRobotPlugin):
         odom_msg.pose.covariance = odom_msg.twist.covariance
         
         self.odom_pub.publish(odom_msg)
+        
+        transform = TransformStamped()
+        transform.header.stamp = odom_msg.header.stamp
+        transform.header.frame_id = "odom"
+
+        transform.child_frame_id = "base_footprint"
+        transform.transform.translation.x = odom_msg.pose.pose.position.x
+        transform.transform.translation.y = odom_msg.pose.pose.position.y 
+        transform.transform.translation.z = odom_msg.pose.pose.position.z
+        
+        transform.transform.rotation = odom_msg.pose.pose.orientation
+
+        self.tf_odom_broadcaster.sendTransform(transform)
         return
     
     def on_physics_step(self, robot, step_size) -> None:
