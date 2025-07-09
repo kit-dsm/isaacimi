@@ -5,10 +5,12 @@ from std_msgs.msg import Int8
 from nav_msgs.msg import Odometry
 from rclpy.time import Time
 from tf2_ros import TransformBroadcaster
+from std_srvs.srv import Empty
 
 import numpy as np
 import math
 
+# todo: enable developers to use custom messages and services defined in other ros packages
 class DummyRobotControllerPlugin(ImiRobotPlugin):   
     def on_plugin_load(self):
         self.ros_node.create_subscription(Twist, "cmd_vel", self.velocity_callback, 1)
@@ -28,6 +30,8 @@ class DummyRobotControllerPlugin(ImiRobotPlugin):
         self.odom_pose = np.zeros(3) # only keep track of x, y, yaw
 
         self.tf_odom_broadcaster = TransformBroadcaster(self.ros_node)
+
+        self.srv_reset_odom = self.ros_node.create_service(Empty, "reset_odom", self.reset_odom_callback)
 
         self.pre_step_time = 0 # used to calculate step size in pre_physics_step
         return
@@ -98,7 +102,7 @@ class DummyRobotControllerPlugin(ImiRobotPlugin):
         transform.transform.translation.x = odom_msg.pose.pose.position.x
         transform.transform.translation.y = odom_msg.pose.pose.position.y 
         transform.transform.translation.z = odom_msg.pose.pose.position.z
-        
+
         transform.transform.rotation = odom_msg.pose.pose.orientation
 
         self.tf_odom_broadcaster.sendTransform(transform)
@@ -130,6 +134,12 @@ class DummyRobotControllerPlugin(ImiRobotPlugin):
             else:
                 robot.set_joint_velocities(np.array([-self.max_lift_moving_speed]))
         return
+    
+    def reset_odom_callback(self, request, response):
+        self.lin_vel_cmd = np.zeros(3)
+        self.ang_vel_cmd = np.zeros(3)
+        self.odom_pose = np.zeros(3)
+        return response
     
 def quaternion_rotation_matrix(Q):
     # Extract the values from Q
