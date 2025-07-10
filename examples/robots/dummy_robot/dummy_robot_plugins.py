@@ -26,12 +26,42 @@ class DummyRobotControllerPlugin(ImiRobotPlugin):
         # the evorobot publishes lift position by publishing the positions (in mm) of the four lift motors to four different publishers
         # i.e. lift/1/position, lift/2/position, ..., lift/4/position
 
+        # You can actually get the odometry of the robot using an action graph, as described here:
+        # https://docs.isaacsim.omniverse.nvidia.com/4.5.0/ros2_tutorials/tutorial_ros2_tf.html
+        # In a real scenario, you would calculate the odometry of the robot using sensors, we will try
+        # to replicate that here.
         self.odom_pub = self.ros_node.create_publisher(Odometry, "odom", 1)
         self.odom_pose = np.zeros(3) # only keep track of x, y, yaw
 
         self.tf_odom_broadcaster = TransformBroadcaster(self.ros_node)
 
         self.srv_reset_odom = self.ros_node.create_service(Empty, "reset_odom", self.reset_odom_callback)
+        
+        # in reality, you would have a set of sensors that can measure the joint states, and publish
+        # those states to /joint_states. However, as this is a simulation, we can get the joint states
+        # directly from the simulation and publish them.
+        import omni.graph.core as og
+        # hardcode for now
+        try:
+            og.Controller.edit(
+                {"graph_path": "/World/dummy1/JointStatePublisher", "evaluator_name": "execution"},
+                {
+                    og.Controller.Keys.CREATE_NODES: [
+                        ("OnPlaybackTick", "omni.graph.action.OnPlaybackTick"),
+                        ("PublishJointState", "isaacsim.ros2.bridge.ROS2PublishJointState"),
+                        ("ReadSimTime", "isaacsim.core.nodes.IsaacReadSimulationTime"),
+                    ],
+                    og.Controller.Keys.CONNECT: [
+                        ("OnPlaybackTick.outputs:tick", "PublishJointState.inputs:execIn"),
+                        ("ReadSimTime.outputs:simulationTime", "PublishJointState.inputs:timeStamp"),
+                    ],
+                    og.Controller.Keys.SET_VALUES: [
+                        ("PublishJointState.inputs:targetPrim", "/World/dummy1/base_footprint")
+                    ],
+                },
+            )
+        except Exception as e:
+            print(e)
 
         self.pre_step_time = 0 # used to calculate step size in pre_physics_step
         return
