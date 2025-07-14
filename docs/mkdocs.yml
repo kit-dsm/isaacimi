@@ -1,2 +1,28 @@
 site_name: isaacimi docs
-theme: material
+theme:
+  name: material
+  features:
+    - navigation.footer
+    - content.code.copy
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+
+nav:
+  - Home: index.md
+  - Overview: overview.md
+  - Getting started:
+    - Installation: getting-started/installation.md
+    - Preparing USD assets: getting-started/preparing-assets.md
+    - Running a simulation: getting-started/running-a-simulation.md
+    - Customizing the simulation: getting-started/customization.md
+  - How-To:
+    - Add ROS dependencies to plugins: how-to/add-ros-dependencies.md
+  - Reference:
+    - YAML config: reference/yaml-config.md
+    - Execution order: reference/yaml-config.md
