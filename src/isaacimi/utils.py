@@ -9,9 +9,22 @@ def load_subclasses_from_file(
     base_class: Type[T],
     allowed_names: Optional[List[str]] = None
 ) -> Dict[str, Type[T]]:
-    """
-    Returns all subclasses of `base_class` defined in the given file.
+    """Returns all subclasses of `base_class` defined in the given file.
     Keyed by class name.
+
+    Args:
+        filepath (str): the path to the Python file
+        base_class (Type[T]): the base class that the subclasses derives from
+        allowed_names (Optional[List[str]], optional): a list of subclass names to return. Any subclass names not in this list will not be returned. Defaults to None.
+
+    Raises:
+        ValueError: if the provided file is not a Python (.py) file
+        FileNotFoundError: if the provided file cannot be found
+        ImportError: if the provided file cannot be loaded as a module
+        ValueError: if a subclass name is listed in allowed_names but cannot be found in the Python file
+
+    Returns:
+        Dict[str, Type[T]]: a dictionary containing the subclasses of `base_class`, keyed by class name
     """
     if not filepath.endswith(".py"):
         raise ValueError(f"{filepath} is not a Python (.py) file.")
