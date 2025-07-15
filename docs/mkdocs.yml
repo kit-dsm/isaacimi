@@ -12,6 +12,21 @@ markdown_extensions:
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - pymdownx.superfences
+  - pymdownx.highlight:
+      default_lang: python
+plugins:
+- search  
+- gen-files:
+    scripts:
+    - scripts/gen_ref_pages.py
+- mkdocstrings:
+    handlers:
+      python:
+        options:
+          docstring_style: google
+- literate-nav:
+    nav_file: SUMMARY.md
+- section-index
 
 nav:
   - Home: index.md
@@ -25,4 +40,5 @@ nav:
     - Add ROS dependencies to plugins: how-to/add-ros-dependencies.md
   - Reference:
     - YAML config: reference/yaml-config.md
-    - Execution order: reference/yaml-config.md
+    - Execution order: reference/execution-order.md
+    - API Reference: reference/
