@@ -24,6 +24,17 @@ plugins:
       python:
         options:
           docstring_style: google
+          show_symbol_type_heading: true
+          show_symbol_type_toc: true
+          show_signature_annotations: true
+          summary: true
+          show_root_full_path: true
+          show_root_heading: true
+          parameter_headings: true
+          inherited_members: true
+          heading_level: 1
+          separate_signature: true
+
 - literate-nav:
     nav_file: SUMMARY.md
 - section-index
