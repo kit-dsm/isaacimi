@@ -5,8 +5,9 @@ from rclpy.node import Node
 from .imi_robot import ImiRobot
 from .ros_manager import RosManager
 
+from abc import ABC, abstractmethod
 
-class ImiRobotPlugin:
+class ImiRobotPlugin(ABC):
     def __init__(self, robot_name: str) -> None:
         """Constructs a robot plugin instance.
 
@@ -24,7 +25,8 @@ class ImiRobotPlugin:
         """
         return RosManager.ensure_node(self._robot_name)
 
-    def on_plugin_load(self) -> None:
+    @abstractmethod
+    def on_plugin_load(self, *args, **kwargs) -> None:
         """Hook called when the plugin is loaded onto the robot.
 
         Any initialization required for the plugin should be done here.
