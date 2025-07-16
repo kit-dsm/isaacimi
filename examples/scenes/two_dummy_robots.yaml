@@ -9,25 +9,42 @@ world:
 
 scene:
   environment:
-    usd_path: /home/fl2644/KIT/imi-isaacsim-env/examples/environments/cone_cylinder_cube.usd # TODO: asset storage system
+    usd_path: /home/fl2644/KIT/isaacimi/examples/environments/cone_cylinder_cube.usd # TODO: asset storage system
     prim_path: /World/environment
   robots:
     - name: dummy1
-      usd_path: /home/fl2644/KIT/imi-isaacsim-env/examples/robots/dummy_robot/dummy_robot.usd # TODO: asset storage system
+      usd_path: /home/fl2644/KIT/isaacimi/examples/robots/dummy_robot/dummy_robot.usd # TODO: asset storage system
       prim_path: /World/dummy1
       position: [0, 0, 0]
       orientation: [1, 0, 0, 0] # quaternion
       plugins: # optional plugins
-        - DummyRobotControllerPlugin
-        - DummyRobotLidarPlugin
+        - class: DummyRobotControllerPlugin
+        - class: DummyRobotLidarPlugin
+          params:
+            parent: /World/dummy1/base_footprint/base_link/fr_lidar
+            name: front_right_lidar
+            config: SICK_microscan3_ABAZ90ZA1P01
+            topic_name: fr_lidar
+            frame_id: fr_lidar
+            translation: [0.1, 0, 0]
+            rotation: [1, 0, 0, 0]
+        - class: DummyRobotLidarPlugin
+          params:
+            parent: /World/dummy1/base_footprint/base_link/bl_lidar
+            name: back_left_lidar
+            config: SICK_microscan3_ABAZ90ZA1P01
+            topic_name: bl_lidar
+            frame_id: bl_lidar
+            translation: [0.1, 0, 0]
+            rotation: [1, 0, 0, 0]
     - name: dummy2
-      usd_path: /home/fl2644/KIT/imi-isaacsim-env/examples/robots/dummy_robot/dummy_robot.usd
+      usd_path: /home/fl2644/KIT/isaacimi/examples/robots/dummy_robot/dummy_robot.usd
       prim_path: /World/dummy2
       position: [1.5, 1.5, 0]
       orientation: [1, 0, 0, 0]
 
 robot_plugins:
-  - filepath: /home/fl2644/KIT/imi-isaacsim-env/examples/robots/dummy_robot/dummy_robot_plugins.py
+  - filepath: /home/fl2644/KIT/isaacimi/examples/robots/dummy_robot/dummy_robot_plugins.py
     classes:
       - DummyRobotControllerPlugin
       - DummyRobotLidarPlugin

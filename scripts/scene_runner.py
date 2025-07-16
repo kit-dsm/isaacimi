@@ -80,7 +80,13 @@ schema = {
                         "plugins": { # optional plugins
                             "type": "list",
                             "required": False,
-                            "schema": {"type": "string"}    
+                            "schema": {
+                                "type": "dict",
+                                "schema": {
+                                    "class": {"type": "string", "required": True},
+                                    "params": {"type": "dict", "required": False}
+                                },
+                            },
                         },
                     },
                 },
@@ -128,11 +134,11 @@ if assets_root_path is None:
 
 from isaacimi.robot_plugin import ImiRobotPlugin
 from isaacimi.utils import load_subclasses_from_file
-robot_plugins: Dict[str, Type[ImiRobotPlugin]] = dict()
+plugin_registry: Dict[str, Type[ImiRobotPlugin]] = dict()
 for entry in scene_config.get("robot_plugins", []):
     plugins = load_subclasses_from_file(entry["filepath"], ImiRobotPlugin, allowed_names=entry["classes"])
-    robot_plugins.update(plugins)
-carb.log_info(f"User defined robot_plugins: {robot_plugins}")
+    plugin_registry.update(plugins)
+carb.log_info(f"User defined robot_plugins: {plugin_registry}")
 
 
 from isaacsim.core.api import World
@@ -183,7 +189,8 @@ for robot_config in scene_config["scene"]["robots"]:
         np.array(robot_config["position"]),
         np.array(robot_config["orientation"])
     )
-    plugins = [robot_plugins[name](robot.name) for name in robot_config.get("plugins", [])]
+    plugins = [(plugin_registry[plugin["class"]](robot.name), plugin.get("params", {})) for plugin in robot_config.get("plugins", [])]
+
     robot_task = ImiRobotTask(robot, plugins)
 
     world.add_task(robot_task)

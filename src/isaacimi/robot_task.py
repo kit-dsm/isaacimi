@@ -1,7 +1,7 @@
 from isaacsim.core.api.tasks import BaseTask
 from isaacsim.core.api.scenes.scene import Scene
 
-# import rclpy
+from typing import Any, Tuple
 
 from typing import List
 
@@ -16,30 +16,30 @@ class ImiRobotTask(BaseTask):
 
     Note: Each robot spawned into the simulation by Isaac IMI, along with it's plugins, ros node, resources, etc. become part of a single task instance that is added to the world via world.add_task() 
     """
-    def __init__(self, robot: ImiRobot, robot_plugins: List[ImiRobotPlugin] = []) -> None:
+    def __init__(self, robot: ImiRobot, robot_plugins: List[Tuple[ImiRobotPlugin, dict[str, Any]]] = []) -> None:
         """Create an instance of ImiRobotTask.
 
         Calls the __init__ for the BaseTask and loads all plugins that were passed in as arguments.
 
         Args:
             robot (ImiRobot): the robot instance contained in this task
-            robot_plugins (List[ImiRobotPlugin], optional): the plugin instances to be loaded onto the robot. Defaults to [].
+            robot_plugins (List[Tuple[ImiRobotPlugin, dict[str, Any]]], optional): a list of tuples containing the plugin instance to be loaded and the user defined params. Defaults to [].
         """
         super().__init__(name=f"{robot.name}_task", offset=None)
         self._robot = robot
-        self._plugins = robot_plugins
-        for plugin in self._plugins:
-            plugin.on_plugin_load()
+        self._plugins = []
+        for plugin_class, plugin_params in robot_plugins:
+            self.add_plugin(plugin_class, **plugin_params)
         return
     
-    def add_plugin(self, plugin: ImiRobotPlugin) -> None:
+    def add_plugin(self, plugin: ImiRobotPlugin, **kwargs: Any) -> None:
         """Loads a plugin onto the robot.
 
         Args:
             plugin (ImiRobotPlugin): the plugin to be loaded
         """
         self._plugins.append(plugin)
-        plugin.on_plugin_load()
+        plugin.on_plugin_load(**kwargs)
         return
 
     def set_up_scene(self, scene: Scene):

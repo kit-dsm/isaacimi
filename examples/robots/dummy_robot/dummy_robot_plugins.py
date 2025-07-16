@@ -237,21 +237,16 @@ import omni
 from pxr import Gf
 import omni.replicator.core as rep
 class DummyRobotLidarPlugin(ImiRobotPlugin):
-    def on_plugin_load(self):
-        # Create the lidar sensor that generates data into "RtxSensorCpu"
-        # Sensor needs to be rotated 90 degrees about X so that its Z up
-
-        # Possible options are Example_Rotary and Example_Solid_State
-        # drive sim applies 0.5,-0.5,-0.5,w(-0.5), we have to apply the reverse
+    def on_plugin_load(self, parent, name, config, topic_name, frame_id, translation, rotation):
         _, sensor = omni.kit.commands.execute(
             "IsaacSensorCreateRtxLidar",
-            path="/microscan",
-            parent="/World/dummy1/base_footprint/base_link/fr_lidar",
-            config="SICK_microscan3_ABAZ90ZA1P01", # you need to modify the app.sensors.nv.lidar.profileBaseFolder setting
-                                                   # in the isaacsim/exts/isaacsim.sensors.rtx/config/extension.toml file to 
-                                                   # add your own lidar config, as explained here: https://forums.developer.nvidia.com/t/add-search-path-for-lidar-configs/255352/2
-            translation=(0.05, 0, 0),
-            orientation=Gf.Quatd(1, 0, 0, 0),  # Gf.Quatd is w,i,j,k
+            path=name,
+            parent=parent,
+            config=config, # you need to modify the app.sensors.nv.lidar.profileBaseFolder setting
+                           # in the isaacsim/exts/isaacsim.sensors.rtx/config/extension.toml file to 
+                           # add your own lidar config, as explained here: https://forums.developer.nvidia.com/t/add-search-path-for-lidar-configs/255352/2
+            translation= tuple(translation),
+            orientation=Gf.Quatd(*rotation),  # Gf.Quatd is w,i,j,k
         )
 
         # RTX sensors are cameras and must be assigned to their own render product
@@ -259,16 +254,17 @@ class DummyRobotLidarPlugin(ImiRobotPlugin):
 
         # # Create Point cloud publisher pipeline in the post process graph
         writer = rep.writers.get("RtxLidar" + "ROS2PublishPointCloud")
-        writer.initialize(topicName="point_cloud", frameId="base_scan")
+        writer.initialize(topicName=topic_name, frameId=frame_id)
         writer.attach([hydra_texture])
 
         # Create the debug draw pipeline in the post process graph
         writer = rep.writers.get("RtxLidar" + "DebugDrawPointCloud")
         writer.attach([hydra_texture])
 
-        # Create LaserScan publisher pipeline in the post process graph
-        writer = rep.writers.get("RtxLidar" + "ROS2PublishLaserScan")
-        writer.initialize(topicName="scan", frameId="base_scan")
-        writer.attach([hydra_texture])
+        # # Note: LaserScan publisher is not working properly at the moment
+        # # Create LaserScan publisher pipeline in the post process graph
+        # writer = rep.writers.get("RtxLidar" + "ROS2PublishLaserScan")
+        # writer.initialize(topicName="scan", frameId="base_scan")
+        # writer.attach([hydra_texture])
 
         return
