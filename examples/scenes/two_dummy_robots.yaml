@@ -19,7 +19,7 @@ scene:
       orientation: [1, 0, 0, 0] # quaternion
       plugins: # optional plugins
         - class: DummyRobotControllerPlugin
-        - class: DummyRobotLidarPlugin
+        - class: LidarPlugin
           params:
             parent: /World/dummy1/base_footprint/base_link/fr_lidar
             name: front_right_lidar
@@ -28,7 +28,7 @@ scene:
             frame_id: fr_lidar
             translation: [0.1, 0, 0]
             rotation: [1, 0, 0, 0]
-        - class: DummyRobotLidarPlugin
+        - class: LidarPlugin
           params:
             parent: /World/dummy1/base_footprint/base_link/bl_lidar
             name: back_left_lidar
@@ -37,6 +37,10 @@ scene:
             frame_id: bl_lidar
             translation: [0.1, 0, 0]
             rotation: [1, 0, 0, 0]
+        - class: JointStatePublisherPlugin
+          params:
+            graph_path: /World/dummy1/JointStatePublisher
+            target_prim: /World/dummy1/base_footprint
     - name: dummy2
       usd_path: /home/fl2644/KIT/isaacimi/examples/robots/dummy_robot/dummy_robot.usd
       prim_path: /World/dummy2
@@ -47,4 +51,5 @@ robot_plugins:
   - filepath: /home/fl2644/KIT/isaacimi/examples/robots/dummy_robot/dummy_robot_plugins.py
     classes:
       - DummyRobotControllerPlugin
-      - DummyRobotLidarPlugin
+      - LidarPlugin
+      - JointStatePublisherPlugin

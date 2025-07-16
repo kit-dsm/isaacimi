@@ -25,45 +25,21 @@ class DummyRobotControllerPlugin(ImiRobotPlugin):
         # TODO: lift position publisher
         # the evorobot publishes lift position by publishing the positions (in mm) of the four lift motors to four different publishers
         # i.e. lift/1/position, lift/2/position, ..., lift/4/position
+        # the dummy robot doesn't have the four lift motors, we can just use the position of the platform via tf2 library instead
 
         # You can actually get the odometry of the robot using an action graph, as described here:
         # https://docs.isaacsim.omniverse.nvidia.com/4.5.0/ros2_tutorials/tutorial_ros2_tf.html
-        # In a real scenario, you would calculate the odometry of the robot using sensors, we will try
-        # to replicate that here.
+        # However, we will calculate the odometry. In a real scenario, you would calculate the odometry of the robot using sensors like wheel encoders,
+        # we will try to replicate that here in our dummy robot.
         self.odom_pub = self.ros_node.create_publisher(Odometry, "odom", 1)
         self.odom_pose = np.zeros(3) # only keep track of x, y, yaw
 
         self.tf_odom_broadcaster = TransformBroadcaster(self.ros_node)
 
         self.srv_reset_odom = self.ros_node.create_service(Empty, "reset_odom", self.reset_odom_callback)
-        
-        # in reality, you would have a set of sensors that can measure the joint states, and publish
-        # those states to /joint_states. However, as this is a simulation, we can get the joint states
-        # directly from the simulation and publish them.
-        import omni.graph.core as og
-        # hardcode for now
-        try:
-            og.Controller.edit(
-                {"graph_path": "/World/dummy1/JointStatePublisher", "evaluator_name": "execution"},
-                {
-                    og.Controller.Keys.CREATE_NODES: [
-                        ("OnPlaybackTick", "omni.graph.action.OnPlaybackTick"),
-                        ("PublishJointState", "isaacsim.ros2.bridge.ROS2PublishJointState"),
-                        ("ReadSimTime", "isaacsim.core.nodes.IsaacReadSimulationTime"),
-                    ],
-                    og.Controller.Keys.CONNECT: [
-                        ("OnPlaybackTick.outputs:tick", "PublishJointState.inputs:execIn"),
-                        ("ReadSimTime.outputs:simulationTime", "PublishJointState.inputs:timeStamp"),
-                    ],
-                    og.Controller.Keys.SET_VALUES: [
-                        ("PublishJointState.inputs:targetPrim", "/World/dummy1/base_footprint")
-                    ],
-                },
-            )
-        except Exception as e:
-            print(e)
 
-        self.pre_step_time = 0 # used to calculate step size in pre_physics_step
+        self.pre_step_time = 0 # used to calculate step size in pre_physics_step. todo: the user should not have to track this
+                               
         return
 
     def velocity_callback(self, data: Twist) -> None:
@@ -113,7 +89,7 @@ class DummyRobotControllerPlugin(ImiRobotPlugin):
         odom_msg.twist.twist.angular.y = float(self.ang_vel_cmd[1])
         odom_msg.twist.twist.angular.z = float(self.ang_vel_cmd[2])
 
-        # todo
+        # TODO: handle covariances
         odom_msg.twist.covariance = np.array([0.1, 0.0, 0.0, 0.0, 0.0, 0.0,   
                                               0.0, 0.1, 0.0, 0.0, 0.0, 0.0, 
                                               0.0, 0.0, 0.1, 0.0, 0.0, 0.0,
@@ -139,9 +115,6 @@ class DummyRobotControllerPlugin(ImiRobotPlugin):
         return
     
     def on_physics_step(self, robot, step_size) -> None:
-        # todo publish odom tf
-        # todo publish joint states
-
         if self.lift_direction == 0:
             self.lift_active = False
 
@@ -170,13 +143,18 @@ class DummyRobotControllerPlugin(ImiRobotPlugin):
         self.ang_vel_cmd = np.zeros(3)
         self.odom_pose = np.zeros(3)
         return response
-    
-def quaternion_rotation_matrix(Q):
+
+def quaternion_rotation_matrix(Q: np.ndarray) -> np.ndarray:
+    """Convert a quaternion to a rotation matrix.
+
+    Args:
+        Q (np.ndarray): a unit quaternion, array of shape (4,) ordered as (w, x, y, z)
+
+    Returns:
+        np.ndarray: a 3x3 rotation matrix, array of shape (3, 3)
+    """
     # Extract the values from Q
-    q0 = Q[0]
-    q1 = Q[1]
-    q2 = Q[2]
-    q3 = Q[3]
+    q0, q1, q2, q3 = Q
     # First row of the rotation matrix
     r00 = 2 * (q0 * q0 + q1 * q1) - 1
     r01 = 2 * (q1 * q2 - q0 * q3)
@@ -201,15 +179,14 @@ def wrap_angle_rad(angle_rad):
 def yaw_to_quaternion(yaw):
     return np.array([math.cos(yaw / 2.0), 0, 0, math.sin(yaw / 2.0)])
 
-def rpy_to_quaternion(rpy):
-    """
-    Convert roll, pitch, yaw to quaternion using numpy arrays.
+def rpy_to_quaternion(rpy: np.ndarray) -> np.ndarray:
+    """Convert roll, pitch, yaw to quaternion.
 
     Args:
-        rpy: np.array of shape (3,) -> [roll, pitch, yaw] in radians
+        rpy (np.ndarray): array of shape (3,) representing [roll, pitch, yaw] in radians
 
     Returns:
-        np.array of shape (4,) -> [x, y, z, w] quaternion
+        np.ndarray: array of shape (4,) representing a quaternion ordered as [x, y, z, w]
     """
     roll, pitch, yaw = rpy
     cy = np.cos(yaw * 0.5)
@@ -224,7 +201,16 @@ def rpy_to_quaternion(rpy):
     z = cr * cp * sy - sr * sp * cy
     return np.array([w, x, y, z])
 
-def quaternion_multiply(q1, q2): # result is q2 * q1
+def quaternion_multiply(q1: np.ndarray, q2: np.ndarray) -> np.ndarray:
+    """Multiply two quaternions, returns q2 * q1
+
+    Args:
+        q1 (np.ndarray): quaternion on the right hand side, array of shape (4,)
+        q2 (np.ndarray): quaternion on the left hand side, array of shape (4,)
+
+    Returns:
+        np.ndarray: result of the quaternion multiplication, array of shape (4,)
+    """
     w1, x1, y1, z1 = q1
     w2, x2, y2, z2 = q2
     w = w2*w1 - x2*x1 - y2*y1 - z2*z1
@@ -233,10 +219,11 @@ def quaternion_multiply(q1, q2): # result is q2 * q1
     z = w2*z1 + x2*y1 - y2*x1 + z2*w1
     return np.array([w, x, y, z])
 
+
 import omni
 from pxr import Gf
 import omni.replicator.core as rep
-class DummyRobotLidarPlugin(ImiRobotPlugin):
+class LidarPlugin(ImiRobotPlugin):
     def on_plugin_load(self, parent, name, config, topic_name, frame_id, translation, rotation):
         _, sensor = omni.kit.commands.execute(
             "IsaacSensorCreateRtxLidar",
@@ -266,5 +253,33 @@ class DummyRobotLidarPlugin(ImiRobotPlugin):
         # writer = rep.writers.get("RtxLidar" + "ROS2PublishLaserScan")
         # writer.initialize(topicName="scan", frameId="base_scan")
         # writer.attach([hydra_texture])
+        return
 
+import omni.graph.core as og
+class JointStatePublisherPlugin(ImiRobotPlugin):
+    def on_plugin_load(self, graph_path, target_prim):
+        # in reality, you would have a set of sensors that can measure the joint states, and publish
+        # those states to /joint_states. However, as this is a simulation, we can get the joint states
+        # directly from the simulation and publish them.
+        # hardcode for now
+        try:
+            og.Controller.edit(
+                {"graph_path": graph_path, "evaluator_name": "execution"},
+                {
+                    og.Controller.Keys.CREATE_NODES: [
+                        ("OnPlaybackTick", "omni.graph.action.OnPlaybackTick"),
+                        ("PublishJointState", "isaacsim.ros2.bridge.ROS2PublishJointState"),
+                        ("ReadSimTime", "isaacsim.core.nodes.IsaacReadSimulationTime"),
+                    ],
+                    og.Controller.Keys.CONNECT: [
+                        ("OnPlaybackTick.outputs:tick", "PublishJointState.inputs:execIn"),
+                        ("ReadSimTime.outputs:simulationTime", "PublishJointState.inputs:timeStamp"),
+                    ],
+                    og.Controller.Keys.SET_VALUES: [
+                        ("PublishJointState.inputs:targetPrim", target_prim)
+                    ],
+                },
+            )
+        except Exception as e:
+            print(e)
         return
