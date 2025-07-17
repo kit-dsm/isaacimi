@@ -1,5 +1,7 @@
 import click
 
+from .sim_runner import run_sim
+
 @click.group()
 @click.version_option(package_name="isaacimi")
 def cli_main():
@@ -16,6 +18,7 @@ def sim():
 def run(blueprint_path):
     """Run a simulation with an isaacimi blueprint
     """
+    run_sim(blueprint_path)
 
 sim.add_command(run)
 

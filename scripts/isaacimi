@@ -28,4 +28,4 @@ extract_isaacsim_python_exe() {
 
 isaacsim_python_exe=$(extract_isaacsim_python_exe)
 
-${isaacsim_python_exe} ${ISAACIMI_DIR}/src/isaacimi/cli.py $@
+${isaacsim_python_exe} -m isaacimi.cli $@
