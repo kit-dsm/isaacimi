@@ -1,0 +1,67 @@
+#!/bin/bash
+
+set -e
+
+SCRIPTS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+ISAACIMI_DIR="$(dirname "$SCRIPTS_DIR")"
+
+# find the python executable provided my Isaac Sim
+extract_isaacsim_python_exe() {
+    if [[ -n "$VIRTUAL_ENV" ]] && python -c "import carb" &>/dev/null; then
+        # Case 1: Isaac Sim was installed via pip
+        # TODO: test for cases where Isaac Sim was installed in system Python
+        echo "[INFO] Isaac Sim detected via pip in virtual environment: $VIRTUAL_ENV"
+        local isaacsim_python_exe=$(which python)
+    else
+        # Case 2: Isaac Sim was installed via pre-built binaries and simlink to the isaacsim directory was created
+        local isaacsim_python_exe=${ISAACIMI_DIR}/_isaac_sim/python.sh
+    fi
+
+    if [ ! -f "${isaacsim_python_exe}" ]; then
+        echo -e "[ERROR] Unable to find any Python executable at path: '${isaacsim_python_exe}'" >&2
+        echo -e "\tThis could be due to the following reasons:" >&2
+        echo -e "\t1. If Isaac Sim was installed via pip, the Python environment is not activated." >&2
+        echo -e "\t2. If Isaac Sim was installed via pre-built binaries, the Python executable is not available at the default path: ${ISAACIMI_DIR}/_isaac_sim/python.sh" >&2
+        echo -e "\t   Ensure a symlink is setup with: ln -s path/to/isaacsim ${ISAACIMI_DIR}/_isaac_sim" >&2
+    fi
+
+    echo ${isaacsim_python_exe}
+}
+
+create_symlink() {
+    TARGET=$1
+    LINK_NAME=$2
+
+    if [ -L "$LINK_NAME" ]; then
+        if [ "$(readlink -f $LINK_NAME)" = "$TARGET" ]; then
+            echo "The symlink between $TARGET and $LINK_NAME already exists."
+            return 0
+        else
+            echo "The symlink $LINK_NAME does not point to target $TARGET."
+            sudo rm $LINK_NAME
+        fi
+    fi
+
+    sudo ln -s $TARGET $LINK_NAME
+    echo "Updated symlink."
+    return 0
+}
+
+isaacsim_python_exe=$(extract_isaacsim_python_exe)
+echo "[INFO] Using pip to install isaacimi into the same Python environment used by Isaac Sim..."
+echo "[INFO] Using Python interpreter: $isaacsim_python_exe"
+${isaacsim_python_exe} -m pip install -e ${ISAACIMI_DIR}
+
+# TODO: setup vscode if not in Docker container
+
+chmod +x "$SCRIPTS_DIR/isaacimi"
+create_symlink "$SCRIPTS_DIR/isaacimi" "/usr/local/bin/isaacimi"
+
+# TODO: setup shell completion
+
+echo "isaacimi has been set up!"
+
+
+
+
+
