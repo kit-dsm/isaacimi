@@ -19,7 +19,7 @@ plugins:
 - search  
 - gen-files:
     scripts:
-    - scripts/gen_ref_pages.py
+    - scripts/gen_api_ref_pages.py
 - mkdocstrings:
     handlers:
       python:
@@ -54,4 +54,4 @@ nav:
     - Command Line Interface: reference/cli.md
     - YAML config: reference/yaml-config.md
     - Execution order: reference/execution-order.md
-    - API Reference: reference/
+    - API Reference: reference/api/
