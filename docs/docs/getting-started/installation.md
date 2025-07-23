@@ -10,15 +10,16 @@ Clone the isaacimi repository:
 git clone git@gitlab.kit.edu:kit/imi/mairo_commons/nvidia-omniverse/isaacimi.git
 ```
 
-If you installed Isaac Sim via pip, Isaac IMI needs to be installed in the same Python environment where Isaam Sim was installed to ensure compatibility with its dependencies. Activate the Python environment first before installing isaacimi with pip:
+> Isaac IMI needs to be installed in the same Python environment where Isaam Sim was installed to ensure compatibility with its dependencies.
+
+**Case 1**: If you installed Isaac Sim using pre-built binaries, set up a symbolic link between the installed Isaac Sim root folder and `_isaac_sim` in the Isaac IMI directory before proceeding:
 ```bash
-cd isaacimi
-pip install -e .
+ln -s <path/to/isaacsim> isaacimi/_isaac_sim
 ```
 
+**Case 2**: If you installed Isaac Sim via pip in a virtual environment, activate your virtual environment before proceeding.
 
-If you installed Isaac Sim using prebuilt binaries, use the [built-in Python environment](https://docs.isaacsim.omniverse.nvidia.com/4.5.0/python_scripting/manual_standalone_python.html) provided by Isaac Sim. Navigate to the Isaac Sim root folder (where you unzipped the Isaac Sim folder during installation) and use the provided `python.sh` script:
+Run the install script:
 ```bash
-cd path/to/isaacsim
-./python.sh -m pip install -e path/to/isaacimi
+./isaacimi/scripts/install.sh
 ```
