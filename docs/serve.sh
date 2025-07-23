@@ -14,7 +14,7 @@ check_pip() {
     done
 }
 
-check_pip mkdocs-material mkdocstrings-python mkdocs-gen-files mkdocs-literate-nav mkdocs-section-index
+check_pip mkdocs-material mkdocstrings-python mkdocs-gen-files mkdocs-literate-nav mkdocs-section-index mkdocs-click
 
 if ! python3 -m pip show isaacimi &> /dev/null; then
     if ! python3 -m pip install -e ..; then

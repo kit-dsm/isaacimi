@@ -14,6 +14,7 @@ markdown_extensions:
   - pymdownx.superfences
   - pymdownx.highlight:
       default_lang: python
+  - mkdocs-click
 plugins:
 - search  
 - gen-files:
@@ -50,6 +51,7 @@ nav:
   - How-To:
     - Add ROS dependencies to plugins: how-to/add-ros-dependencies.md
   - Reference:
+    - Command Line Interface: reference/cli.md
     - YAML config: reference/yaml-config.md
     - Execution order: reference/execution-order.md
     - API Reference: reference/
