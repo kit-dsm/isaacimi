@@ -1,4 +1,4 @@
-schema = {
+blueprint_schema = {
     "app": {
         "type": "dict",
         "required": True,
