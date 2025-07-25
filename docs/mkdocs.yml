@@ -15,6 +15,8 @@ markdown_extensions:
   - pymdownx.highlight:
       default_lang: python
   - mkdocs-click
+  - admonition
+  - pymdownx.details
 plugins:
 - search  
 - gen-files:
@@ -45,7 +47,9 @@ nav:
   - Home: index.md
   - Overview: overview.md
   - Getting started:
-    - Installation: getting-started/installation.md
+    - Installation:
+        - Local Installation: getting-started/local-installation.md
+        - Docker Deployment: getting-started/docker-deployment.md
     - Preparing USD assets: getting-started/preparing-assets.md
     - Running a simulation: getting-started/running-a-simulation.md
     - Customizing the simulation: getting-started/customization.md

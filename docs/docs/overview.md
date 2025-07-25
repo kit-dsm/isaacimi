@@ -1,8 +1,8 @@
-Isaac IMI was designed to make it easy to run different simulation scenarios. The goal of this page is to show how to Isaac IMI can be used to quickly get a simulation up and running, and is not intended to be a tutorial or a reference. The [Getting Started](getting-started/installation.md) tutorial covers how to run a simulation in more detail.
+Isaac IMI was designed to make it easy to run many different simulation scenarios. The goal of this page is to show how to Isaac IMI can be used to quickly get a simulation up and running, and is not intended to be a tutorial or a reference. The [Getting Started](getting-started/installation.md) tutorial covers how to run a simulation in more detail.
 
-## Create a simulation config
-Create a configuration yaml file that describes the simulation you want to run.
-```yaml title="my_simulation_project/configs/evorobot_unitree_warehouse.yaml"
+## Create a simulation blueprint
+Create a yaml file that describes the simulation you want to run.
+```yaml title="my_simulation_project/blueprints/evorobot_unitree_warehouse.yaml"
 app:
   headless: false
   renderer: RayTracedLighting
@@ -34,13 +34,13 @@ scene:
       orientation: [1, 0, 0, 0]
 ```
 ## Run the simulation
-Run the simulation from the terminal using the Isaac Sim python environment:
+Isaac IMI provides a simple command line interface.
 ```bash
-python3 isaacimi/sripts/scene_runner.py --config my_simulation_project/configs/evorobot_unitree_warehouse.yaml
+isaacimi sim run my_simulation_project/configs/evorobot_unitree_warehouse.yaml
 ```
 
 ## Add your own custom plugins
-To add functionality to the robots you spawn in the simulation, you create create robot plugins - reusable pieces of logic run that can be run on any robot in the simulation. Let's create a simple ROS subscriber plugin that each robot will use:
+To add functionality to the robots you spawn in the simulation, you can create "robot plugins" - reusable pieces of logic run that can be run on any robot spawned in the simulation. Let's create a simple ROS subscriber plugin for the evorobots:
 
 ``` py title="my_simulation_project/plugins/simple_subscriber_plugin.py"
 
@@ -64,8 +64,8 @@ class SimpleSubscriber(ImiRobotPlugin):
         return
 ```
 
-Now, to use the plugin in your simulation, you can add it to your yaml config file:
-```yaml title="my_simulation_project/configs/evorobot_unitree_warehouse.yaml" hl_lines="20 21 27 28 34 35 37 38 39 40"
+Now, to use the plugin in your simulation, you can add it to your blueprint file:
+```yaml title="my_simulation_project/configs/evorobot_unitree_warehouse.yaml" hl_lines="20 21 27 28 37 38 39 40"
 app:
   headless: false
   renderer: RayTracedLighting
@@ -99,8 +99,6 @@ scene:
       prim_path: /World/Unitree_Go2_1
       position: [1.5, 1.5, 0]
       orientation: [1, 0, 0, 0]
-      plugins:
-        - SimpleSubscriber
 
 robot_plugins:
   - filepath: /home/user/my_simulation_project/plugins/simple_subscriber_plugin.py

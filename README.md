@@ -13,7 +13,7 @@ The [documentation](docs/README.md) page provides everything you need to use isa
 Since Isaac Sim uses Universal Scene Description (USD) for all assets, you need to create a `.usd` file to describe each robot you want to simulate, and the environment you want to simulate them in. 
 
 ### 2. Create a simulation blueprint
-Once you have the `.usd` assets, create a blueprint that describes the simulation you want to run.
+Once you have the `.usd` assets, create a yaml file that describes the simulation you want to run.
 ```yaml
 # my_custom_sim.yaml
 app:
