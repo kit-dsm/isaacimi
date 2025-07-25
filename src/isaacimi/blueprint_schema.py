@@ -1,47 +1,96 @@
+from cerberus import Validator
+class BlueprintValidator(Validator):
+    # create a custom rule called "__description" so we can generate documentation from the schema in docs/scripts/gen_schema_ref_pages.py
+    def _validate___description(self, constraint, field, value):
+        pass
+
 blueprint_schema = {
     "app": {
+        "__description": "All settings relating to the simulation app that is launched.",
         "type": "dict",
         "required": True,
         "schema": {
-            "headless": {"type": "boolean", "required": True},
+            "headless": {
+                "__description": "Whether to run the simulation in headless mode or not.",
+                "type": "boolean",
+                "required": True
+            },
             "renderer": {
+                "__description": "Specify which renderer to use in the simulation.",
                 "type": "string",
                 "allowed": ["RayTracedLighting", "PathTracing"],
                 "required": True
-            }
+            },
         },
     },
     "world": {
+        "__description": "All settings related to the world in the simulation.",
         "type": "dict",
         "required": True,
         "schema": {
-            "stage_units_in_meters": {"type": "float", "required": True},
-            "physics_dt": {"type": "float", "required": True},
-            "rendering_dt": {"type": "float", "required": True}
+            "stage_units_in_meters": {
+                "__description": "The size in meters of one unit length in the simulation.",
+                "type": "float",
+                "required": True
+            },
+            "physics_dt": {
+                "__description": "Physics timestep in seconds.",
+                "type": "float",
+                "required": True,
+            },
+            "rendering_dt": {
+                "__description": "Render timestep in seconds.",
+                "type": "float",
+                "required": True
+            },
         },
     },
     "scene": {
+        "__description": "All settings related to the scene that will take place in the simulation.",
         "type": "dict",
         "required": True,
         "schema": {
             "environment": {
+                "__description": "The environment of the scene.",
                 "type": "dict",
                 "required": True,
                 "schema": {
-                    "usd_path": {"type": "string", "required": True},
-                    "prim_path": {"type": "string", "required": True},
+                    "usd_path": {
+                        "__description": "Path to a .usd file containing the environment.",
+                        "type": "string",
+                        "required": True
+                    },
+                    "prim_path": {
+                        "__description": "Path of the environment prim in the simulation.",
+                        "type": "string",
+                        "required": True
+                    },
                 },
             },
             "robots": {
+                "__description": "A list of all robots that will spawn into the environment.",
                 "type": "list",
                 "required": True,
                 "schema": {
                     "type": "dict",
                     "schema": {
-                        "name": {"type": "string", "required": True},
-                        "usd_path": {"type": "string", "required": True},
-                        "prim_path": {"type": "string", "required": True},
+                        "name": {
+                            "__description": "The name of the robot, must be unique.",
+                            "type": "string",
+                            "required": True
+                        },
+                        "usd_path": {
+                            "__description": "Path to a .usd file containing the robot.",
+                            "type": "string",
+                            "required": True
+                        },
+                        "prim_path": {
+                            "__description": "Path to the robot prim in the simulation.",
+                            "type": "string",
+                            "required": True
+                        },
                         "position": {
+                            "__description": "The position of the robot (relative to the parent prim) when spawned.",
                             "type": "list",
                             "required": True,
                             "schema": {"type": "float"},
@@ -49,6 +98,7 @@ blueprint_schema = {
                             "maxlength": 3,
                         },
                         "orientation": {
+                            "__description": "The orientation of the robot (relative to the parent prim) when spawned.",
                             "type": "list",
                             "required": True,
                             "schema": {"type": "float"},
@@ -56,13 +106,22 @@ blueprint_schema = {
                             "maxlength": 4,
                         },
                         "plugins": { # optional plugins
+                            "__description": "A list of optional plugins to load on the robot.",
                             "type": "list",
                             "required": False,
                             "schema": {
                                 "type": "dict",
                                 "schema": {
-                                    "class": {"type": "string", "required": True},
-                                    "params": {"type": "dict", "required": False}
+                                    "class": {
+                                        "__description": "The name of the custom plugin class.",
+                                        "type": "string",
+                                        "required": True
+                                    },
+                                    "params": {
+                                        "__description": "The parameters to pass to the plugin, if required.",
+                                        "type": "dict",
+                                        "required": False
+                                    }
                                 },
                             },
                         },
@@ -72,13 +131,19 @@ blueprint_schema = {
         },
     },
     "robot_plugins": {
+        "__description": "A list of all user defined plugins to be used in the simulation.",
         "type": "list",
         "required": False,
         "schema": {
             "type": "dict",
             "schema": {
-                "filepath": {"type": "string", "required": True},
+                "filepath": {
+                    "__description": "Path to the .py file that defines the custom plugins.",
+                    "type": "string",
+                    "required": True
+                },
                 "classes": {
+                    "__description": "A list of all plugins to import from the .py file.",
                     "type": "list",
                     "required": True,
                     'schema': {'type': 'string', 'empty': False},

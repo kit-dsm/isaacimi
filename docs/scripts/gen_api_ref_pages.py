@@ -9,6 +9,10 @@ nav = mkdocs_gen_files.Nav()
 root = Path(__file__).parent.parent.parent
 src = root / "src"  
 
+modules_to_exclude = [
+    "blueprint_schema"
+]
+
 for path in sorted(src.rglob("*.py")):  
     module_path = path.relative_to(src).with_suffix("")  
     doc_path = path.relative_to(src).with_suffix(".md")  
@@ -22,7 +26,9 @@ for path in sorted(src.rglob("*.py")):
         full_doc_path = full_doc_path.with_name("index.md")
     elif parts[-1] == "__main__":
         continue
-
+    elif parts[-1] in modules_to_exclude:
+        continue
+    
     nav[parts] = doc_path.as_posix() 
 
     with mkdocs_gen_files.open(full_doc_path, "w") as fd:  

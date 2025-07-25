@@ -9,9 +9,9 @@ def run_sim(blueprint_path: Path):
 
     import sys
     import carb
-    from cerberus import Validator
-    from .schema import schema
-    v = Validator(schema)
+    from .blueprint_schema import blueprint_schema, BlueprintValidator
+
+    v = BlueprintValidator(blueprint_schema)
     if not v.validate(scene_config):
         carb.log_error(f"The provided config file is invalid: {v.errors}")
         sys.exit(1)
