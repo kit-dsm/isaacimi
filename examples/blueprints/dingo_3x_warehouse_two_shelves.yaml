@@ -17,6 +17,15 @@ scene:
       prim_path: /World/dingo1
       position: [2, 0, 0]
       orientation: [1, 0, 0, 0]
+      plugins:
+        - class: DifferentialControllerPlugin
+          params:
+            namespace: dingo1
+            topic_name: cmd_vel
+            wheel_radius: 0.0492
+            wheel_base: 0.45232
+            left_wheel_joint_name: left_wheel_joint
+            right_wheel_joint_name: right_wheel_joint
     - name: dingo2
       usd_path: /home/fl2644/KIT/isaacimi/examples/robots/clearpath_dingo.usd # replace this path with your robot .usd file
       prim_path: /World/dingo2
@@ -27,3 +36,8 @@ scene:
       prim_path: /World/dingo3
       position: [2, -3, 0]
       orientation: [1, 0, 0, 0]
+
+robot_plugins:
+  - filepath: /home/fl2644/KIT/isaacimi/examples/plugins/differential_controller_plugin.py
+    classes:
+      - DifferentialControllerPlugin
