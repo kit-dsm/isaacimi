@@ -48,24 +48,24 @@ class ImiRobotTask(BaseTask):
         Args:
             scene (Scene): the scene instance
         """
-        super().set_up_scene(scene)
+        super().set_up_scene(scene) # the scene @property in BaseTask is set here 
         scene.add(self._robot)
         for plugin in self._plugins:
-            plugin.set_up_scene(scene)
+            plugin.set_up_scene(self._robot, scene)
         return
     
     def post_reset(self) -> None:
-        """Calls `post_reset()` for all plugins loaded on the robot.
+        """Calls `initialize()` for all plugins loaded on the robot.
         """
         for plugin in self._plugins:
-            plugin.post_reset()
+            plugin.initialize(self._robot)
         return
 
     def cleanup(self) -> None:
         """Calls `cleanup()` for all plugins loaded on the robot.
         """
         for plugin in self._plugins:
-            plugin.cleanup()
+            plugin.cleanup(self.scene)
         return
     
     def pre_step(self, time_step_index: int, simulation_time: float) -> None:

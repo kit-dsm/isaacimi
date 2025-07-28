@@ -10,7 +10,6 @@ def run_sim(blueprint_path: Path):
     import sys
     import carb
     from .blueprint_schema import blueprint_schema, BlueprintValidator
-
     v = BlueprintValidator(blueprint_schema)
     if not v.validate(scene_config):
         carb.log_error(f"The provided config file is invalid: {v.errors}")
@@ -94,12 +93,18 @@ def run_sim(blueprint_path: Path):
         plugins = [(plugin_registry[plugin["class"]](robot.name), plugin.get("params", {})) for plugin in robot_config.get("plugins", [])]
 
         robot_task = ImiRobotTask(robot, plugins)
-
         world.add_task(robot_task)
-        world.add_physics_callback(f"{robot_task.name}_physics_callback", robot_task.on_physics_step)
 
 
+    # physics get initialized when world.reset() is called
+    # internally performs one physics step
     world.reset()
+
+
+    # register the physics_callback for each robot task
+    # should be done after the first world.reset() is called to prevent the on_physics_step callback (in plugins) from being called before physics are initialized
+    for task_name, task_obj in world.get_current_tasks().items():
+        world.add_physics_callback(f"{task_name}_physics_callback", task_obj.on_physics_step)
 
 
     from isaacimi.ros_manager import RosManager

@@ -27,32 +27,39 @@ class ImiRobotPlugin(ABC):
 
     @abstractmethod
     def on_plugin_load(self, *args, **kwargs) -> None:
-        """Hook called when the plugin is loaded onto the robot.
+        """Hook called when the plugin is loaded onto the robot. This method is called only once per simulation.
 
-        Any initialization required for the plugin should be done here.
+        Any setup required for the plugin, including parameter parsing, should be done here.
         """
         return
     
-    def set_up_scene(self, scene: Scene) -> None:
-        """Called at the beginning of the simulation.
+    def set_up_scene(self, robot: ImiRobot, scene: Scene) -> None:
+        """Called at the beginning of the simulation. This method is called only once per simulation.
 
-        Any custom modifications to the scene, such as adding assets, should be done here.
+        Any custom modifications to the robot or scene, such as adding assets, should be done here.
+
+        Note: at this point, the robot has been added to the scene but it's physics have not been initialized.
+
+        Args:
+            scene (Scene): the scene instance
+            robot (ImiRobot): the robot instance that this plugin is loaded onto
+        """
+        return
+
+    def cleanup(self, scene: Scene) -> None:
+        """Called just before calling a `reset()` on the world.
+
+        Note: Any assets that were added **during** the simulation should be removed here.
 
         Args:
             scene (Scene): the scene instance
         """
         return
-
-    def cleanup(self) -> None:
-        """Called before calling a `reset()` on the world to remove temporary objects that were added during
-        simulation.
-
-        Note: Any objects that were added during `set_up_scene()` should be removed here.
-        """
-        return
     
-    def post_reset(self) -> None:
-        """Called whenever `reset()` is called on the world.
+    def initialize(self, robot: ImiRobot) -> None:
+        """Called just after calling a `reset()` on the world.
+
+        Note: At this point, the robot's physics have been initialized. Any remaining initialization for the plugin should be done here.
         """
         return
 
