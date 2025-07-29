@@ -52,7 +52,7 @@ nav:
         - Docker Deployment: getting-started/docker-deployment.md
     - Preparing USD assets: getting-started/preparing-assets.md
     - Running a simulation: getting-started/running-a-simulation.md
-    - Customizing the simulation: getting-started/customization.md
+    - Adding robot plugins: getting-started/adding-robot-plugins.md
   - How-To:
     - Add ROS dependencies to plugins: how-to/add-ros-dependencies.md
   - Reference:
