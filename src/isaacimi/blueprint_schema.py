@@ -1,7 +1,11 @@
 from cerberus import Validator
 class BlueprintValidator(Validator):
-    # create a custom rule called "__description" so we can generate documentation from the schema in docs/scripts/gen_schema_ref_pages.py
     def _validate___description(self, constraint, field, value):
+        """ A description of the value. This rule was created to generate documentation for the schema using the script docs/scripts/gen_schema_ref_pages.py
+
+        The rule's arguments are validated against this schema:
+        {'type': 'string'}
+        """
         pass
 
 blueprint_schema = {
