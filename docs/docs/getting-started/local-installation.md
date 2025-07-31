@@ -21,5 +21,5 @@ ln -s <path/to/isaacsim> isaacimi/_isaac_sim
 
 Run the install script:
 ```bash
-./isaacimi/scripts/install.sh
+sudo ./isaacimi/scripts/install.sh
 ```

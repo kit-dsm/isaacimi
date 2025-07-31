@@ -38,11 +38,11 @@ create_symlink() {
             return 0
         else
             echo "The symlink $LINK_NAME does not point to target $TARGET."
-            sudo rm $LINK_NAME
+            rm $LINK_NAME
         fi
     fi
 
-    sudo ln -s $TARGET $LINK_NAME
+    ln -s $TARGET $LINK_NAME
     echo "Updated symlink."
     return 0
 }
