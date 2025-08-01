@@ -9,13 +9,13 @@ The three robots are spawned in the simulation, but they currently aren't doing 
 !!! note
     You could technically add functionality to your robot wihout using a robot plugin by creating an [action graph](https://docs.isaacsim.omniverse.nvidia.com/latest/omnigraph/omnigraph_tutorial.html). However, plugins are recommended because it offers greater visibility and control over what happens on the robot. For more details on why plugins are preferred, see the [architecture](../architecture.md) page.
 
-In the real world, your robot might run a ROS node to perform path planning, and a ROS node to compute the `Twist` (linear and angular velocity) message required for your robot to follow that path. Typically, this `Twist` message would be translated to some lower level control input for the motors (can be velocity, torque, PWM, depending on the motor). However, in a simulated world, we are no longer working with motors but rather joints. Thus, whatever controller was used to control the motors of the robot in real life needs to be replaced with with a controller that controls the joints of the robot in simulation.
+In the real world, your robot might run a ROS node to perform path planning, and a ROS node to compute the `Twist` (linear and angular velocity) message required for your robot to follow that path. Then, a controller might translate this `Twist` message into some lower level control input for the motors (can be velocity, torque, PWM, depending on the motor). However, in a simulated world, we are no longer working with motors but rather joints. Thus, whatever controller was used to control the motors of the robot in real life needs to be replaced with with a controller that controls the joints of the robot in simulation.
 
 ### Creating a controller plugin
 Since the Clearpath Dingo is a differential drive robot, let's create a differential controller robot plugin to use across all three robots in the warehouse. Each plugin instance will listen to `Twist` messages published to the `cmd_vel` topic for that robot, and apply the necessary joint commands to move the robot. The example plugin created in this section can be found in `isaacimi/examples/plugins/differential_controller_plugin.py`.
 
 Create a new `differential_controller_plugin.py` file, and create a robot plugin class called `DifferentialControllerPlugin` that extends the `ImiRobotPlugin` class. The base class provides several hooks for you to override, such as `on_plugin_load`, which is called when the plugin is attached to the robot. More information on the different hooks that are provided can be found in the [API Reference page](../reference/api/isaacimi/robot_plugin.md).
-```python
+```python title="differential_controller_plugin.py"
 from isaacimi.robot_plugin import ImiRobotPlugin
 
 class DifferentialControllerPlugin(ImiRobotPlugin):
@@ -72,7 +72,7 @@ When the plugin is loaded, we want to create a subscriber to the `cmd_vel` topic
 
 Remember that physics steps may occur many times in a second, and your ROS callback will not execute every physics step. Thus, we need to save the published twist commands to `self.lin_vel_cmd` and `self.ang_vel_cmd` variables so we can use them in the `pre_physics_step` method.
 
-```python
+```python title="differential_controller_plugin.py"
 from isaacimi.robot_plugin import ImiRobotPlugin
 
 from geometry_msgs.msg import Twist
@@ -102,19 +102,19 @@ class DummyRobotPlugin(ImiRobotPlugin):
 ```
 
 ### Implementing the controller
-We can also use the `DifferentialController` class provided by Isaac Sim to compute the joint commands required to make our robot follow the twist command. You can most definitely do your own calculations, but we are using the built-in class for simplicity. The `DifferentialController`, requires the `wheel_radius` and `wheel_base` of the robot in meters to calculate the joint velocities, which are `0.0492` and `0.45232` respectively.
+We can use the `DifferentialController` class provided by Isaac Sim to compute the joint commands required to make our robot follow the twist command. You can most definitely do your own calculations, but we are using this built-in class for simplicity. The `DifferentialController`, requires the `wheel_radius` and `wheel_base` of the robot in meters to calculate the joint velocities, which are `0.0492` and `0.45232` respectively.
 
 All joint commands (velocity, position, or effort) need to be packaged in an `ArticulationAction` object. So, we create a member variable to store the most current `ArticulationAction`. More information on this class can be found on the [Isaac Sim docs](https://docs.isaacsim.omniverse.nvidia.com/4.5.0/robot_simulation/articulation_controller.html#articulation-action).
 
-In the `pre_physics_step` method, we can compute the joint velocities using the `DifferentialController.forward()` method, which accepts a two element `np.ndarray` consisting of the desired linear and angular speed for our robot, and outputs an `ArticulationAction` object with joint velocities for the left and right wheel joints. This `ArticulationAction` object shouldn't be used directly, as it only contains commands for two joints. The Dingo robot has two joints but if you had a robot with more joints, your `ArticulationAction` object should contain a joint command for each joint on your robot.
+In the `pre_physics_step` method, we can compute the joint velocities using the `DifferentialController.forward()` method, which accepts a two element `np.ndarray` consisting of the desired linear and angular speed for our robot (i.e. the `Twist`), and outputs an `ArticulationAction` object containing joint velocities for the left and right wheel joints. As described in the Isaac Sim documentation for `ArticulationAction`, there are a few ways to populate the object. In this scenario, we will populate the object with commands for all joints on the robot. Therefore, our `ArticulationAction` object should match the number of joints on our robot.
 
 To get the number of joints on our Dingo robot, we can use the `num_dof` property on the `robot` instance, which returns the number of joints it has. We need to do this in the `initialize` method of our plugin, because that is when the robot's physics are initialized and joint information becomes available.
 
-Additionally, When we populate the `ArticulationAction` object with our wheel velocity commands, we need to place the commands at the correct index, as each index corresponds to a specific joint. We know that name of the left and right wheel joints on the Dingo are `left_wheel_joint` and `right_wheel_joint` respectively, so we can get the index of each joint using the `robot.get_dof_index()` method.
+Additionally, when we populate the `ArticulationAction` object with our wheel velocity commands, we need to place the commands at the correct index, as each index corresponds to a specific joint. We know that name of the left and right wheel joints on the Dingo are `left_wheel_joint` and `right_wheel_joint` respectively, so we can get the index of each joint using the `robot.get_dof_index()` method.
 
 Finally, now that we have the total number of joints on our robot, and know which index in the `ArticulationAction` object corresponds to the left and right wheel joints, we can construct our `ArticulationAction` object and apply it to the robot using the `robot.apply_action()` method.
 
-```python hl_lines="15-24 28-41 53-65"
+```python title="differential_controller_plugin.py" hl_lines="17-26 29-42 54-66"
 from isaacimi.robot_plugin import ImiRobotPlugin
 
 from geometry_msgs.msg import Twist
@@ -188,7 +188,7 @@ class DummyRobotPlugin(ImiRobotPlugin):
 You may have noticed that we hardcoded some values that were specific to the Dingo robot, such as the ROS topic name, the wheel radius, wheel base, the left wheel joint name, and the right wheel joint name. To make this plugin as modular as possible, we can set these values with parameters.
 
 We can add as many parameters as we want to the `on_plugin_load` method:
-```python hl_lines="2 4 11 14 15 29 30"
+```python title="differential_controller_plugin.py" hl_lines="2 4 11 14 15 28 29"
 class DummyRobotPlugin(ImiRobotPlugin):
     def on_plugin_load(self, namespace, topic_name, wheel_radius, wheel_base, left_wheel_joint_name, right_wheel_joint_name):
         # create ROS subscriber
