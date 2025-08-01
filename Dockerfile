@@ -27,6 +27,8 @@ RUN --mount=type=cache,target=/var/cache/apt \
     # Add sourcing of setup.bash to .bashrc
     && echo "source /opt/ros/humble/setup.bash" >> ${HOME}/.bashrc
 
+ENV IN_DOCKER=1
+
 COPY . /isaacimi
 # Create symlink to Isaac Sim install
 RUN ln -sf /isaac-sim /isaacimi/_isaac_sim

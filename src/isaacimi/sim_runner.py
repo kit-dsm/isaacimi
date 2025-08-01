@@ -1,5 +1,6 @@
 from typing import Dict, Type
 from pathlib import Path
+import os
 
 
 def resolve_path_in_blueprint(path: str, blueprint_path: str, allowed_extensions: set = None) -> str:
@@ -50,10 +51,16 @@ def run_sim(blueprint_path: str):
         sys.exit(1)
 
 
+    in_docker = os.getenv("IN_DOCKER") == "1"
+
     # The SimulationApp needs to start before importing any packages from isaac.core, otherwise a ModuleNotFoundError is raised
     from isaacsim import SimulationApp
+    headless = scene_config["app"]["headless"]
+    if in_docker and headless == False:
+        carb.log_warn("Docker container detected. Simulation running in headless mode.")
+        headless = True
     app_config = {
-        "headless": scene_config["app"]["headless"],
+        "headless": headless,
         "renderer": scene_config["app"]["renderer"],
     }
     simulation_app = SimulationApp(app_config)
