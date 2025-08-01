@@ -44,6 +44,7 @@ def run_sim(blueprint_path: str):
     import carb
     from .blueprint_schema import blueprint_schema, BlueprintValidator
     v = BlueprintValidator(blueprint_schema)
+    scene_config = v.normalized(scene_config)
     if not v.validate(scene_config):
         carb.log_error(f"The provided config file is invalid: {v.errors}")
         sys.exit(1)
@@ -83,6 +84,8 @@ def run_sim(blueprint_path: str):
 
     from isaacsim.core.utils.extensions import enable_extension
     enable_extension("isaacsim.ros2.bridge")
+    if scene_config["app"]["livestream"]:
+        enable_extension("omni.kit.livestream.webrtc")
 
 
     import rclpy

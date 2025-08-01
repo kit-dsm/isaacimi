@@ -25,6 +25,11 @@ blueprint_schema = {
                 "allowed": ["RayTracedLighting", "PathTracing"],
                 "required": True
             },
+            "livestream": {
+                "__description": "Whether to enable a livestream server for streaming clients to connect to.",
+                "type": "boolean",
+                "default": False   
+            }
         },
     },
     "world": {
