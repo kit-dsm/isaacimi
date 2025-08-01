@@ -25,6 +25,9 @@ The `app` settings configures the Isaac Sim application that will be run. Here, 
 
 Now, to spawn the AMRs in the environment, we can add the following `scene` settings to the YAML file:
 
+!!! info
+    Simulations ran inside a Docker container, as described in the [Docker Deployment](../docker-deployment.md) section, will be ran in headless mode. Any value given to `headless` in the simulation blueprint will be overwritten by `true`. To view headless simulations, download the Isaac Sim WebRTC Streaming Client from the [Isaac Sim website](https://docs.isaacsim.omniverse.nvidia.com/4.5.0/installation/download.html#isaac-sim-latest-release). In your simulation blueprint, set `livestream` to `true` under the `app` setting to start a livestream server when your simulation is run. Finally, run your simulation and connect the WebRTC client to the livestream server. More details on the WebRTC client can be found [here](https://docs.isaacsim.omniverse.nvidia.com/4.5.0/installation/manual_livestream_clients.html).
+
 ```yaml title="dingo_3x_warehouse_two_shelves.yaml" hl_lines="10-29"
 app:
   headless: false
