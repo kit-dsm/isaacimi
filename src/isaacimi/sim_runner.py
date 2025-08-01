@@ -1,7 +1,40 @@
-from typing import Dict, Type, List
+from typing import Dict, Type
 from pathlib import Path
 
-def run_sim(blueprint_path: Path):
+
+def resolve_path_in_blueprint(path: str, blueprint_path: str, allowed_extensions: set = None) -> str:
+    """Resolves a file path provided in the simulation blueprint to an absolute, normalized path.
+
+    If the file path provided in the simulation blueprint is already a valid absolute path, return it.
+    Otherwise, it is treated as relative to the simulation blueprint file.
+
+    Args:
+        path (str): The file path provided in the simulation blueprint
+        blueprint_path (str): The path to the simulation blueprint
+        allowed_extensions (set, optional): A set of allowed file extensions. Defaults to None.
+
+    Raises:
+        FileNotFoundError: If the provided file path does not exist
+        IsADirectoryError: If the provided path is a directory instead of a file 
+        ValueError: If the provided file path has an invalid extension
+
+    Returns:
+        str: Resolved absolute path to the file
+    """
+    # TODO: paths to cloud assets
+    blueprint_dir = Path(blueprint_path).resolve().parent
+    path_obj = Path(path)
+    resolved_path = path_obj if path_obj.is_absolute() else (blueprint_dir / path_obj).resolve()
+    if not resolved_path.exists():
+        raise FileNotFoundError(f"The provided path does not exist: {resolved_path}")
+    if not resolved_path.is_file():
+        raise IsADirectoryError(f"The provided path is not a file: {resolved_path}")
+    if allowed_extensions and resolved_path.suffix.lower() not in allowed_extensions:
+        raise ValueError(f"The provided path {resolved_path} has an invalid file extension. Allowed: {allowed_extensions}")
+    return str(resolved_path)
+    
+
+def run_sim(blueprint_path: str):
     import yaml
     with open(blueprint_path, 'r') as scene_config_file:
         scene_config = yaml.safe_load(scene_config_file)
@@ -36,8 +69,9 @@ def run_sim(blueprint_path: Path):
     from isaacimi.robot_plugin import ImiRobotPlugin
     from isaacimi.utils import load_subclasses_from_file
     plugin_registry: Dict[str, Type[ImiRobotPlugin]] = dict()
+    plugin_file_extensions = {".py"}
     for entry in scene_config.get("robot_plugins", []):
-        plugins = load_subclasses_from_file(entry["filepath"], ImiRobotPlugin, allowed_names=entry["classes"])
+        plugins = load_subclasses_from_file(resolve_path_in_blueprint(entry["filepath"], blueprint_path, allowed_extensions=plugin_file_extensions), ImiRobotPlugin, allowed_names=entry["classes"])
         plugin_registry.update(plugins)
     carb.log_info(f"User defined robot_plugins: {plugin_registry}")
 
@@ -75,8 +109,10 @@ def run_sim(blueprint_path: Path):
         print(e)
 
 
+    usd_file_extensions = {".usd", ".usda"}
+
     from isaacsim.core.utils.stage import add_reference_to_stage
-    add_reference_to_stage(usd_path=scene_config["scene"]["environment"]["usd_path"], prim_path=scene_config["scene"]["environment"]["prim_path"])
+    add_reference_to_stage(usd_path=resolve_path_in_blueprint(scene_config["scene"]["environment"]["usd_path"], blueprint_path, allowed_extensions=usd_file_extensions), prim_path=scene_config["scene"]["environment"]["prim_path"])
 
 
     import numpy as np
@@ -86,7 +122,7 @@ def run_sim(blueprint_path: Path):
         robot = ImiRobot(
             robot_config["prim_path"],
             robot_config["name"],
-            robot_config["usd_path"],
+            resolve_path_in_blueprint(robot_config["usd_path"], blueprint_path, allowed_extensions=usd_file_extensions),
             np.array(robot_config["position"]),
             np.array(robot_config["orientation"])
         )
