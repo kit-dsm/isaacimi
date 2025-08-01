@@ -14,21 +14,21 @@ world:
 
 scene:
   environment:
-    usd_path: /home/user/my_simulation_project/environments/warehouse.usd
+    usd_path: ../environments/warehouse.usd
     prim_path: /World/environment
   robots:
     - name: Evorobot_1
-      usd_path: /home/user/my_simulation_project/robots/evorobot.usd
+      usd_path: ../robots/evorobot.usd
       prim_path: /World/Evorobot_1
       position: [0, 0, 0]
       orientation: [1, 0, 0, 0]
     - name: Evorobot_2
-      usd_path: /home/user/my_simulation_project/robots/evorobot.usd
+      usd_path: ../robots/evorobot.usd
       prim_path: /World/Evorobot_2
       position: [-1.5, -1.5, 0]
       orientation: [1, 0, 0, 0]
     - name: Unitree_Go2_1
-      usd_path: /home/user/my_simulation_project/robots/unitree_go2.usd
+      usd_path: ../robots/unitree_go2.usd
       prim_path: /World/Unitree_Go2_1
       position: [1.5, 1.5, 0]
       orientation: [1, 0, 0, 0]
@@ -77,31 +77,31 @@ world:
 
 scene:
   environment:
-    usd_path: /home/user/my_simulation_project/environments/warehouse.usd
+    usd_path: ../environments/warehouse.usd
     prim_path: /World/environment
   robots:
     - name: Evorobot_1
-      usd_path: /home/user/my_simulation_project/robots/evorobot.usd
+      usd_path: ../robots/evorobot.usd
       prim_path: /World/Evorobot_1
       position: [0, 0, 0]
       orientation: [1, 0, 0, 0]
       plugins:
         - SimpleSubscriber
     - name: Evorobot_2
-      usd_path: /home/user/my_simulation_project/robots/evorobot.usd
+      usd_path: ../robots/evorobot.usd
       prim_path: /World/Evorobot_2
       position: [-1.5, -1.5, 0]
       orientation: [1, 0, 0, 0]
       plugins:
         - SimpleSubscriber
     - name: Unitree_Go2_1
-      usd_path: /home/user/my_simulation_project/robots/unitree_go2.usd
+      usd_path: ../robots/unitree_go2.usd
       prim_path: /World/Unitree_Go2_1
       position: [1.5, 1.5, 0]
       orientation: [1, 0, 0, 0]
 
 robot_plugins:
-  - filepath: /home/user/my_simulation_project/plugins/simple_subscriber_plugin.py
+  - filepath: ../plugins/simple_subscriber_plugin.py
     classes:
       - SimpleSubscriber
 ```

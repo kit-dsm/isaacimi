@@ -36,25 +36,25 @@ world:
 
 scene:
   environment:
-    usd_path: /home/user/isaacimi/examples/environments/warehouse_two_shelves.usd # replace this path with the path to your environment .usd file
+    usd_path: path/to/warehouse_two_shelves.usd # replace this path with the path to your environment .usd file
     prim_path: /World/environment
   robots:
     - name: dingo1
-      usd_path: /home/user/isaacimi/examples/robots/clearpath_dingo.usd # replace this path with the path to your robot .usd file
+      usd_path: path/to/clearpath_dingo.usd # replace this path with the path to your robot .usd file
       prim_path: /World/dingo1
       position: [2, 0, 0]
       orientation: [1, 0, 0, 0]
       plugins:
         - class: DifferentialControllerPlugin
     - name: dingo2
-      usd_path: /home/user/isaacimi/examples/robots/clearpath_dingo.usd # replace this path with the path to your robot .usd file
+      usd_path: path/to/clearpath_dingo.usd # replace this path with the path to your robot .usd file
       prim_path: /World/dingo2
       position: [2, 3, 0]
       orientation: [1, 0, 0, 0]
       plugins:
         - class: DifferentialControllerPlugin
     - name: dingo3
-      usd_path: /home/user/KIT/isaacimi/examples/robots/clearpath_dingo.usd # replace this path with the path to your robot .usd file
+      usd_path: path/to/clearpath_dingo.usd # replace this path with the path to your robot .usd file
       prim_path: /World/dingo3
       position: [-2, -3, 0]
       orientation: [1, 0, 0, 0]
@@ -62,7 +62,7 @@ scene:
         - class: DifferentialControllerPlugin
 
 robot_plugins:
-  - filepath: /home/user/isaacimi/examples/plugins/differential_controller_plugin.py # replace this path with the path to the .py file containing your controller plugin
+  - filepath: path/to/differential_controller_plugin.py # replace this path with the path to the .py file containing your controller plugin
     classes:
       - DifferentialControllerPlugin
 ```
@@ -243,11 +243,11 @@ world:
 
 scene:
   environment:
-    usd_path: /home/user/isaacimi/examples/environments/warehouse_two_shelves.usd # replace this path with the path to your environment .usd file
+    usd_path: path/to/warehouse_two_shelves.usd # replace this path with the path to your environment .usd file
     prim_path: /World/environment
   robots:
     - name: dingo1
-      usd_path: /home/user/isaacimi/examples/robots/clearpath_dingo.usd # replace this path with the path to your robot .usd file
+      usd_path: path/to/clearpath_dingo.usd # replace this path with the path to your robot .usd file
       prim_path: /World/dingo1
       position: [2, 0, 0]
       orientation: [1, 0, 0, 0]
@@ -261,7 +261,7 @@ scene:
             left_wheel_joint_name: left_wheel_joint
             right_wheel_joint_name: right_wheel_joint
     - name: dingo2
-      usd_path: /home/user/isaacimi/examples/robots/clearpath_dingo.usd # replace this path with the path to your robot .usd file
+      usd_path: path/to/clearpath_dingo.usd # replace this path with the path to your robot .usd file
       prim_path: /World/dingo2
       position: [2, 3, 0]
       orientation: [1, 0, 0, 0]
@@ -275,7 +275,7 @@ scene:
             left_wheel_joint_name: left_wheel_joint
             right_wheel_joint_name: right_wheel_joint
     - name: dingo3
-      usd_path: /home/user/KIT/isaacimi/examples/robots/clearpath_dingo.usd # replace this path with the path to your robot .usd file
+      usd_path: path/to/clearpath_dingo.usd # replace this path with the path to your robot .usd file
       prim_path: /World/dingo3
       position: [-2, -3, 0]
       orientation: [1, 0, 0, 0]
@@ -290,7 +290,7 @@ scene:
             right_wheel_joint_name: right_wheel_joint
 
 robot_plugins:
-  - filepath: /home/user/isaacimi/examples/plugins/differential_controller_plugin.py # replace this path with the path to the .py file containing your controller plugin
+  - filepath: path/to/differential_controller_plugin.py # replace this path with the path to the .py file containing your controller plugin
     classes:
       - DifferentialControllerPlugin
 ```

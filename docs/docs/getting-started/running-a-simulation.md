@@ -37,28 +37,28 @@ world:
 
 scene:
   environment:
-    usd_path: /home/user/isaacimi/examples/environments/warehouse_two_shelves.usd # replace this path with your environment .usd file
+    usd_path: path/to/warehouse_two_shelves.usd # replace this path with your environment .usd file
     prim_path: /World/environment
   robots:
     - name: dingo1
-      usd_path: /home/user/isaacimi/examples/robots/clearpath_dingo.usd # replace this path with your robot .usd file
+      usd_path: path/to/clearpath_dingo.usd # replace this path with your robot .usd file
       prim_path: /World/dingo1
       position: [2, 0, 0]
       orientation: [1, 0, 0, 0]
     - name: dingo2
-      usd_path: /home/user/isaacimi/examples/robots/clearpath_dingo.usd # replace this path with your robot .usd file
+      usd_path: path/to/clearpath_dingo.usd # replace this path with your robot .usd file
       prim_path: /World/dingo2
       position: [2, 3, 0]
       orientation: [1, 0, 0, 0]
     - name: dingo3
-      usd_path: /home/user/KIT/isaacimi/examples/robots/clearpath_dingo.usd # replace this path with your robot .usd file
+      usd_path: path/to/clearpath_dingo.usd # replace this path with your robot .usd file
       prim_path: /World/dingo3
       position: [-2, -3, 0]
       orientation: [1, 0, 0, 0]
 ```
 
 !!! note
-    The `usd_path` setting should contain the absolute path to the assets that you prepared in the [preparing assets](preparing-assets.md) section.
+    The `usd_path` setting can be an absolute path or a relative path from the simulation blueprint to the assets that you prepared in the [preparing assets](preparing-assets.md) section.
 
 These settings will spawn three robots described our `clearpath_dingo.usd` file in an environment described by our `warehouse_two_shelves.usd` file.
 
