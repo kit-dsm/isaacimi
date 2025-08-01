@@ -1,0 +1,37 @@
+services:
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - ACCEPT_EULA=Y
+      - PRIVACY_CONSENT=Y
+    volumes: #https://docs.isaacsim.omniverse.nvidia.com/4.5.0/installation/install_faq.html
+      - ~/docker/isaac-sim/cache/kit:/isaac-sim/kit/cache:rw              #For cache
+      - ~/docker/isaac-sim/cache/ov:/root/.cache/ov:rw                    #For cache
+      - ~/docker/isaac-sim/cache/pip:/root/.cache/pip:rw                  #For cache
+      - ~/docker/isaac-sim/cache/glcache:/root/.cache/nvidia/GLCache:rw   #For cache
+      - ~/docker/isaac-sim/cache/computecache:/root/.nv/ComputeCache:rw   #For cache
+      - ~/docker/isaac-sim/logs:/root/.nvidia-omniverse/logs:rw           #For log files
+      - ~/docker/isaac-sim/data:/root/.local/share/ov/data:rw             #For Isaac Sim data
+      - ~/docker/isaac-sim/documents:/root/Documents:rw                   #For adding new or saving files
+      - type: bind
+        source: $HOME/isaacimi-workspace
+        target: /workspace
+    deploy:
+      resources:
+        reservations:
+         devices:
+          - driver: nvidia
+            count: all
+            capabilities: [ gpu ]
+    network_mode: host
+    entrypoint: bash
+    runtime: nvidia
+    stdin_open: true
+    tty: true
+
+
+  
+
+
