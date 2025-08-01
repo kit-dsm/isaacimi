@@ -36,7 +36,7 @@ scene:
 ## Run the simulation
 Isaac IMI provides a simple command line interface.
 ```bash
-isaacimi sim run my_simulation_project/configs/evorobot_unitree_warehouse.yaml
+isaacimi sim run my_simulation_project/blueprints/evorobot_unitree_warehouse.yaml
 ```
 
 ## Add your own custom plugins
@@ -65,7 +65,7 @@ class SimpleSubscriber(ImiRobotPlugin):
 ```
 
 Now, to use the plugin in your simulation, you can add it to your blueprint file:
-```yaml title="my_simulation_project/configs/evorobot_unitree_warehouse.yaml" hl_lines="20 21 27 28 37 38 39 40"
+```yaml title="my_simulation_project/blueprints/evorobot_unitree_warehouse.yaml" hl_lines="20 21 27 28 37 38 39 40"
 app:
   headless: false
   renderer: RayTracedLighting
