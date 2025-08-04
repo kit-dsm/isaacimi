@@ -218,39 +218,3 @@ def quaternion_multiply(q1: np.ndarray, q2: np.ndarray) -> np.ndarray:
     y = w2*y1 - x2*z1 + y2*w1 + z2*x1
     z = w2*z1 + x2*y1 - y2*x1 + z2*w1
     return np.array([w, x, y, z])
-
-
-import omni
-from pxr import Gf
-import omni.replicator.core as rep
-class LidarPlugin(ImiRobotPlugin):
-    def on_plugin_load(self, parent, name, config, topic_name, frame_id, translation, rotation):
-        _, sensor = omni.kit.commands.execute(
-            "IsaacSensorCreateRtxLidar",
-            path=name,
-            parent=parent,
-            config=config, # you need to modify the app.sensors.nv.lidar.profileBaseFolder setting
-                           # in the isaacsim/exts/isaacsim.sensors.rtx/config/extension.toml file to 
-                           # add your own lidar config, as explained here: https://forums.developer.nvidia.com/t/add-search-path-for-lidar-configs/255352/2
-            translation= tuple(translation),
-            orientation=Gf.Quatd(*rotation),  # Gf.Quatd is w,i,j,k
-        )
-
-        # RTX sensors are cameras and must be assigned to their own render product
-        hydra_texture = rep.create.render_product(sensor.GetPath(), [1, 1], name="Isaac")
-
-        # # Create Point cloud publisher pipeline in the post process graph
-        writer = rep.writers.get("RtxLidar" + "ROS2PublishPointCloud")
-        writer.initialize(topicName=topic_name, frameId=frame_id)
-        writer.attach([hydra_texture])
-
-        # Create the debug draw pipeline in the post process graph
-        writer = rep.writers.get("RtxLidar" + "DebugDrawPointCloud")
-        writer.attach([hydra_texture])
-
-        # # Note: LaserScan publisher is not working properly at the moment
-        # # Create LaserScan publisher pipeline in the post process graph
-        # writer = rep.writers.get("RtxLidar" + "ROS2PublishLaserScan")
-        # writer.initialize(topicName="scan", frameId="base_scan")
-        # writer.attach([hydra_texture])
-        return
