@@ -254,32 +254,3 @@ class LidarPlugin(ImiRobotPlugin):
         # writer.initialize(topicName="scan", frameId="base_scan")
         # writer.attach([hydra_texture])
         return
-
-import omni.graph.core as og
-class JointStatePublisherPlugin(ImiRobotPlugin):
-    def on_plugin_load(self, graph_path, target_prim):
-        # in reality, you would have a set of sensors that can measure the joint states, and publish
-        # those states to /joint_states. However, as this is a simulation, we can get the joint states
-        # directly from the simulation and publish them.
-        # hardcode for now
-        try:
-            og.Controller.edit(
-                {"graph_path": graph_path, "evaluator_name": "execution"},
-                {
-                    og.Controller.Keys.CREATE_NODES: [
-                        ("OnPlaybackTick", "omni.graph.action.OnPlaybackTick"),
-                        ("PublishJointState", "isaacsim.ros2.bridge.ROS2PublishJointState"),
-                        ("ReadSimTime", "isaacsim.core.nodes.IsaacReadSimulationTime"),
-                    ],
-                    og.Controller.Keys.CONNECT: [
-                        ("OnPlaybackTick.outputs:tick", "PublishJointState.inputs:execIn"),
-                        ("ReadSimTime.outputs:simulationTime", "PublishJointState.inputs:timeStamp"),
-                    ],
-                    og.Controller.Keys.SET_VALUES: [
-                        ("PublishJointState.inputs:targetPrim", target_prim)
-                    ],
-                },
-            )
-        except Exception as e:
-            print(e)
-        return

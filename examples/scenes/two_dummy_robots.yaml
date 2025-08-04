@@ -39,8 +39,8 @@ scene:
             rotation: [1, 0, 0, 0]
         - class: JointStatePublisherPlugin
           params:
-            graph_path: /World/dummy1/JointStatePublisher
-            target_prim: /World/dummy1/base_footprint
+            namespace: dummy1
+            topic_name: joint_states
     - name: dummy2
       usd_path: /home/fl2644/KIT/isaacimi/examples/robots/dummy_robot/dummy_robot.usd
       prim_path: /World/dummy2
@@ -52,4 +52,6 @@ robot_plugins:
     classes:
       - DummyRobotControllerPlugin
       - LidarPlugin
+  - filepath: /home/fl2644/KIT/isaacimi/examples/plugins/joint_state_publisher_plugin.py
+    classes:
       - JointStatePublisherPlugin
