@@ -13,7 +13,7 @@ scene:
     prim_path: /World/environment
   robots:
     - name: dummy1
-      usd_path: ../robots/dummy_robot/dummy_robot.usd # TODO: asset storage system
+      usd_path: ../robots/dummy_robot.usd # TODO: asset storage system
       prim_path: /World/dummy1
       position: [0, 0, 0]
       orientation: [1, 0, 0, 0] # quaternion
@@ -44,13 +44,13 @@ scene:
             namespace: dummy1
             topic_name: joint_states
     - name: dummy2
-      usd_path: ../robots/dummy_robot/dummy_robot.usd
+      usd_path: ../robots/dummy_robot.usd
       prim_path: /World/dummy2
       position: [1.5, 1.5, 0]
       orientation: [1, 0, 0, 0]
 
 robot_plugins:
-  - filepath: ../robots/dummy_robot/dummy_robot_plugins.py
+  - filepath: ../plugins/dummy_robot_plugins.py
     classes:
       - DummyRobotControllerPlugin
   - filepath: ../plugins/joint_state_publisher_plugin.py
