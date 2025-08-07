@@ -34,7 +34,11 @@ class RosManager:
             cls._executor = rclpy.executors.MultiThreadedExecutor()
             cls._rclpy_init = True
         if robot_name not in cls._nodes:
-            node = Node(f"{robot_name}_node")
+            node = Node(
+                node_name = "isaacsim_node",
+                namespace=f"/{robot_name}",
+                cli_args=["--remap", "/tf:=tf", "--remap", "/tf_static:=tf_static"]
+            )
             node.set_parameters([
                 Parameter('use_sim_time', Parameter.Type.BOOL, True)
             ])
