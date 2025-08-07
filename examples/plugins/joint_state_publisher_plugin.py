@@ -2,8 +2,7 @@ from isaacimi.robot_plugin import ImiRobotPlugin
 import omni.graph.core as og
 
 class JointStatePublisherPlugin(ImiRobotPlugin):
-    def on_plugin_load(self, namespace, topic_name):
-        self.namespace = namespace
+    def on_plugin_load(self, topic_name):
         self.topic_name = topic_name
         return
     
@@ -33,7 +32,7 @@ class JointStatePublisherPlugin(ImiRobotPlugin):
                         # Note: the robot.prim_path property will return the articulation root of the robot
                         ("PublishJointState.inputs:targetPrim", robot.prim_path),
                         ("PublishJointState.inputs:topicName", self.topic_name),
-                        ("PublishJointState.inputs:nodeNamespace", self.namespace)
+                        ("PublishJointState.inputs:nodeNamespace", robot.name)
                     ],
                 },
             )
