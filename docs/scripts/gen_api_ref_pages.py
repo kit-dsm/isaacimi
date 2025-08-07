@@ -10,7 +10,8 @@ root = Path(__file__).parent.parent.parent
 src = root / "src"  
 
 modules_to_exclude = [
-    "blueprint_schema"
+    "blueprint_schema",
+    "cli"
 ]
 
 for path in sorted(src.rglob("*.py")):  
