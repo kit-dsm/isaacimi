@@ -55,6 +55,8 @@ nav:
     - Adding robot plugins: getting-started/adding-robot-plugins.md
   - How-To:
     - Add ROS dependencies to plugins: how-to/add-ros-dependencies.md
+  - Topic guides:
+    - Working with ROS: topic-guides/working-with-ros.md
   - Reference:
     - Command Line Interface: reference/cli.md
     - Simulation blueprint: reference/simulation-blueprint.md
