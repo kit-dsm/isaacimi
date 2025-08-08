@@ -12,12 +12,12 @@ import math
 
 # todo: enable developers to use custom messages and services defined in other ros packages
 class DummyRobotControllerPlugin(ImiRobotPlugin):   
-    def on_plugin_load(self):
-        self.ros_node.create_subscription(Twist, "cmd_vel", self.velocity_callback, 1)
+    def on_plugin_load(self, twist_topic, lift_topic):
+        self.ros_node.create_subscription(Twist, f"{twist_topic}", self.velocity_callback, 1)
         self.lin_vel_cmd = np.zeros(3)
         self.ang_vel_cmd = np.zeros(3)
 
-        self.ros_node.create_subscription(Int8, "cmd_lift", self.lift_callback, 1)
+        self.ros_node.create_subscription(Int8, f"{lift_topic}", self.lift_callback, 1)
         self.lift_direction = 0 # either -1, 0, or +1
         self.max_lift_moving_speed = 0.25
         self.lift_active = False
