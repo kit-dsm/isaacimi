@@ -1,13 +1,13 @@
 from typing import Dict, Type
 from pathlib import Path
 import os
-
+from urllib.parse import urlparse
 
 def resolve_path_in_blueprint(path: str, blueprint_path: str, allowed_extensions: set = None) -> str:
     """Resolves a file path provided in the simulation blueprint to an absolute, normalized path.
 
-    If the file path provided in the simulation blueprint is already a valid absolute path, return it.
-    Otherwise, it is treated as relative to the simulation blueprint file.
+    If the file path is a server or cloud url, leave it unchanged. If the file path provided in the simulation blueprint
+    is already a valid absolute path, return it. Otherwise, it is treated as relative to the simulation blueprint file.
 
     Args:
         path (str): The file path provided in the simulation blueprint
@@ -22,7 +22,10 @@ def resolve_path_in_blueprint(path: str, blueprint_path: str, allowed_extensions
     Returns:
         str: Resolved absolute path to the file
     """
-    # TODO: paths to cloud assets
+    supported_schemes = ("http", "https", "omniverse")
+    parsed_url = urlparse(path)
+    if parsed_url.scheme in supported_schemes:
+        return path
     blueprint_dir = Path(blueprint_path).resolve().parent
     path_obj = Path(path)
     resolved_path = path_obj if path_obj.is_absolute() else (blueprint_dir / path_obj).resolve()
