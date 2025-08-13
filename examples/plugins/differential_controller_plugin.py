@@ -34,8 +34,8 @@ class DifferentialControllerPlugin(ImiRobotPlugin):
 
     def initialize(self, robot):
         # get the joint index corresponding to the left and right wheel joints
-        self.left_wheel_joint_index = robot.get_dof_index("left_wheel_joint")
-        self.right_wheel_joint_index = robot.get_dof_index("right_wheel_joint")
+        self.left_wheel_joint_index = robot.get_dof_index(self.left_wheel_joint_name)
+        self.right_wheel_joint_index = robot.get_dof_index(self.left_wheel_joint_name)
 
         # get the number of joints on our robot
         self.num_joints = robot.num_dof
