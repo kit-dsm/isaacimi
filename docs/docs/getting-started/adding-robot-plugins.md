@@ -190,9 +190,9 @@ You may have noticed that we hardcoded some values that were specific to the Din
 We can add as many parameters as we want to the `on_plugin_load` method:
 ```python title="differential_controller_plugin.py" hl_lines="2 4 11 14 15 28 29"
 class DummyRobotPlugin(ImiRobotPlugin):
-    def on_plugin_load(self, namespace, topic_name, wheel_radius, wheel_base, left_wheel_joint_name, right_wheel_joint_name):
+    def on_plugin_load(self, topic_name, wheel_radius, wheel_base, left_wheel_joint_name, right_wheel_joint_name):
         # create ROS subscriber
-        self.ros_node.create_subscription(Twist, f"/{namespace}/{topic_name}", self.twist_cmd_callback, 1)
+        self.ros_node.create_subscription(Twist, f"{topic_name}", self.twist_cmd_callback, 1)
         
         # variables to store the Twist command
         self.lin_vel_cmd = np.zeros(3)
@@ -254,7 +254,6 @@ scene:
       plugins:
         - class: DifferentialControllerPlugin
           params:
-            namespace: dingo1
             topic_name: cmd_vel
             wheel_radius: 0.0492
             wheel_base: 0.45232
@@ -268,7 +267,6 @@ scene:
       plugins:
         - class: DifferentialControllerPlugin
           params:
-            namespace: dingo1
             topic_name: cmd_vel
             wheel_radius: 0.0492
             wheel_base: 0.45232
@@ -282,7 +280,6 @@ scene:
       plugins:
         - class: DifferentialControllerPlugin
           params:
-            namespace: dingo1
             topic_name: cmd_vel
             wheel_radius: 0.0492
             wheel_base: 0.45232

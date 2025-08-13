@@ -8,9 +8,9 @@ from isaacsim.core.utils.types import ArticulationAction
 import numpy as np
 
 class DifferentialControllerPlugin(ImiRobotPlugin):   
-    def on_plugin_load(self, namespace, topic_name, wheel_radius, wheel_base, left_wheel_joint_name, right_wheel_joint_name):
+    def on_plugin_load(self, topic_name, wheel_radius, wheel_base, left_wheel_joint_name, right_wheel_joint_name):
         # create ROS subscriber
-        self.ros_node.create_subscription(Twist, f"/{namespace}/{topic_name}", self.twist_cmd_callback, 1)
+        self.ros_node.create_subscription(Twist, f"{topic_name}", self.twist_cmd_callback, 1)
         
         # variables to store the Twist command
         self.lin_vel_cmd = np.zeros(3)
