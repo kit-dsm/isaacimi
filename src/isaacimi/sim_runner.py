@@ -1,42 +1,5 @@
 from typing import Dict, Type
-from pathlib import Path
 import os
-from urllib.parse import urlparse
-
-def resolve_path_in_blueprint(path: str, blueprint_path: str, allowed_extensions: set = None) -> str:
-    """Resolves a file path provided in the simulation blueprint to an absolute, normalized path.
-
-    If the file path is a server or cloud url, leave it unchanged. If the file path provided in the simulation blueprint
-    is already a valid absolute path, return it. Otherwise, it is treated as relative to the simulation blueprint file.
-
-    Args:
-        path (str): The file path provided in the simulation blueprint
-        blueprint_path (str): The path to the simulation blueprint
-        allowed_extensions (set, optional): A set of allowed file extensions. Defaults to None.
-
-    Raises:
-        FileNotFoundError: If the provided file path does not exist
-        IsADirectoryError: If the provided path is a directory instead of a file 
-        ValueError: If the provided file path has an invalid extension
-
-    Returns:
-        str: Resolved absolute path to the file
-    """
-    supported_schemes = ("http", "https", "omniverse")
-    parsed_url = urlparse(path)
-    if parsed_url.scheme in supported_schemes:
-        return path
-    blueprint_dir = Path(blueprint_path).resolve().parent
-    path_obj = Path(path)
-    resolved_path = path_obj if path_obj.is_absolute() else (blueprint_dir / path_obj).resolve()
-    if not resolved_path.exists():
-        raise FileNotFoundError(f"The provided path does not exist: {resolved_path}")
-    if not resolved_path.is_file():
-        raise IsADirectoryError(f"The provided path is not a file: {resolved_path}")
-    if allowed_extensions and resolved_path.suffix.lower() not in allowed_extensions:
-        raise ValueError(f"The provided path {resolved_path} has an invalid file extension. Allowed: {allowed_extensions}")
-    return str(resolved_path)
-    
 
 def run_sim(blueprint_path: str):
     import yaml
@@ -76,7 +39,7 @@ def run_sim(blueprint_path: str):
         simulation_app.close()
         sys.exit(1)
 
-
+    from .utils import resolve_path_in_blueprint
     from isaacimi.robot_plugin import ImiRobotPlugin
     from isaacimi.utils import load_subclasses_from_file
     plugin_registry: Dict[str, Type[ImiRobotPlugin]] = dict()
