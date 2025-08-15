@@ -59,6 +59,8 @@ def load_subclasses_from_file(
             raise ValueError(f"The following class(es) were not found in {filepath} as subclasses of {base_class.__name__}: {', '.join(missing)}")
         
         return {name: subclasses[name] for name in allowed_names}
+    
+    return subclasses
 
 
 def resolve_path_in_blueprint(path: str, blueprint_path: str, allowed_extensions: set = None) -> str:
@@ -86,7 +88,8 @@ def resolve_path_in_blueprint(path: str, blueprint_path: str, allowed_extensions
         return path
     blueprint_dir = Path(blueprint_path).resolve().parent
     path_obj = Path(path)
-    resolved_path = path_obj if path_obj.is_absolute() else (blueprint_dir / path_obj).resolve()
+    resolved_path = path_obj if path_obj.is_absolute() else (blueprint_dir / path_obj)
+    resolved_path = resolved_path.resolve()
     if not resolved_path.exists():
         raise FileNotFoundError(f"The provided path does not exist: {resolved_path}")
     if not resolved_path.is_file():
