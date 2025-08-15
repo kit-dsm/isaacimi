@@ -55,6 +55,7 @@ nav:
     - Adding robot plugins: getting-started/adding-robot-plugins.md
   - How-To:
     - Add ROS dependencies to plugins: how-to/add-ros-dependencies.md
+    - Start simulations with ROS launch: how-to/start-sim-with-ros-launch.md
   - Topic guides:
     - Working with ROS: topic-guides/working-with-ros.md
   - Reference:
