@@ -1,8 +1,12 @@
-from isaacsim.core.api.scenes.scene import Scene
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from isaacsim.core.api.scenes.scene import Scene
+    from .imi_robot import ImiRobot
 
 from rclpy.node import Node
 
-from .imi_robot import ImiRobot
 from .ros_manager import RosManager
 
 from abc import ABC, abstractmethod
