@@ -14,7 +14,7 @@ def sim():
     """
 
 @click.command()
-@click.argument("blueprint_path", nargs=1, type=click.Path(exists=False))
+@click.argument("blueprint_path", nargs=1, type=click.Path(exists=True, dir_okay=False))
 def run(blueprint_path):
     """Run a simulation with an isaacimi blueprint
     """

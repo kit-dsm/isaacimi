@@ -1,25 +1,32 @@
 from typing import Dict, Type
 import os
+from pathlib import Path
+import yaml
+
+from .blueprint_schema import blueprint_schema, BlueprintValidator
 
 def run_sim(blueprint_path: str):
-    import yaml
-    with open(blueprint_path, 'r') as scene_config_file:
+    blueprint_path_obj = Path(blueprint_path)
+
+    if not blueprint_path_obj.is_file():
+        raise FileNotFoundError(f"Blueprint file {blueprint_path_obj} does not exist.")
+    
+    if blueprint_path_obj.suffix.lower() != ".yaml":
+        raise ValueError(f"Blueprint file {blueprint_path_obj} must be a .yaml file.")
+    
+    with open(blueprint_path, "r") as scene_config_file:
         scene_config = yaml.safe_load(scene_config_file)
 
-
-    import sys
-    import carb
-    from .blueprint_schema import blueprint_schema, BlueprintValidator
     v = BlueprintValidator(blueprint_schema)
     scene_config = v.normalized(scene_config)
     if not v.validate(scene_config):
-        carb.log_error(f"The provided config file is invalid: {v.errors}")
-        sys.exit(1)
+        raise ValueError(f"The provided blueprint file is invalid: {v.errors}")
 
 
     in_docker = os.getenv("IN_DOCKER") == "1"
 
     # The SimulationApp needs to start before importing any packages from isaac.core, otherwise a ModuleNotFoundError is raised
+    import carb
     from isaacsim import SimulationApp
     headless = scene_config["app"]["headless"]
     if in_docker and headless == False:
@@ -32,12 +39,12 @@ def run_sim(blueprint_path: str):
     simulation_app = SimulationApp(app_config)
 
 
-    from isaacsim.storage.native import get_assets_root_path
-    assets_root_path = get_assets_root_path()
-    if assets_root_path is None:
-        carb.log_error("Could not find Isaac Sim assets folder")
-        simulation_app.close()
-        sys.exit(1)
+    # from isaacsim.storage.native import get_assets_root_path
+    # assets_root_path = get_assets_root_path()
+    # if assets_root_path is None:
+    #     carb.log_error("Could not find Isaac Sim assets folder")
+    #     simulation_app.close()
+
 
     from .utils import resolve_path_in_blueprint
     from isaacimi.robot_plugin import ImiRobotPlugin
