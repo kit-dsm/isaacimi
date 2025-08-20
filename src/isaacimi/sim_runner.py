@@ -4,8 +4,12 @@ from pathlib import Path
 import yaml
 
 from .blueprint_schema import blueprint_schema, BlueprintValidator
+from .utils import resolve_path_in_blueprint
+from isaacimi.robot_plugin import ImiRobotPlugin
+from isaacimi.utils import load_subclasses_from_file
 
 def run_sim(blueprint_path: str):
+    # Load the blueprint file
     blueprint_path_obj = Path(blueprint_path)
 
     if not blueprint_path_obj.is_file():
@@ -14,61 +18,54 @@ def run_sim(blueprint_path: str):
     if blueprint_path_obj.suffix.lower() != ".yaml":
         raise ValueError(f"Blueprint file {blueprint_path_obj} must be a .yaml file.")
     
-    with open(blueprint_path, "r") as scene_config_file:
-        scene_config = yaml.safe_load(scene_config_file)
+    with open(blueprint_path, "r") as blueprint_file:
+        blueprint = yaml.safe_load(blueprint_file)
 
+
+    # Normalize and validate the blueprint file
     v = BlueprintValidator(blueprint_schema)
-    scene_config = v.normalized(scene_config)
-    if not v.validate(scene_config):
+    blueprint = v.normalized(blueprint)
+    if not v.validate(blueprint):
         raise ValueError(f"The provided blueprint file is invalid: {v.errors}")
-
-
-    in_docker = os.getenv("IN_DOCKER") == "1"
+    
 
     # The SimulationApp needs to start before importing any packages from isaac.core, otherwise a ModuleNotFoundError is raised
-    import carb
     from isaacsim import SimulationApp
-    headless = scene_config["app"]["headless"]
+    import carb
+    in_docker = os.getenv("IN_DOCKER") == "1"
+    headless = blueprint["app"]["headless"]
     if in_docker and headless == False:
         carb.log_warn("Docker container detected. Simulation running in headless mode.")
         headless = True
     app_config = {
         "headless": headless,
-        "renderer": scene_config["app"]["renderer"],
+        "renderer": blueprint["app"]["renderer"],
     }
     simulation_app = SimulationApp(app_config)
 
 
-    # from isaacsim.storage.native import get_assets_root_path
-    # assets_root_path = get_assets_root_path()
-    # if assets_root_path is None:
-    #     carb.log_error("Could not find Isaac Sim assets folder")
-    #     simulation_app.close()
-
-
-    from .utils import resolve_path_in_blueprint
-    from isaacimi.robot_plugin import ImiRobotPlugin
-    from isaacimi.utils import load_subclasses_from_file
+    # Add user-defined robot_plugins to the plugin registry
     plugin_registry: Dict[str, Type[ImiRobotPlugin]] = dict()
     plugin_file_extensions = {".py"}
-    for entry in scene_config.get("robot_plugins", []):
+    for entry in blueprint.get("robot_plugins", []):
         plugins = load_subclasses_from_file(resolve_path_in_blueprint(entry["filepath"], blueprint_path, allowed_extensions=plugin_file_extensions), ImiRobotPlugin, allowed_names=entry["classes"])
         plugin_registry.update(plugins)
     carb.log_info(f"User defined robot_plugins: {plugin_registry}")
 
 
     from isaacsim.core.api import World
-    world = World(scene_config["world"]["stage_units_in_meters"])
-    world.set_simulation_dt(physics_dt=scene_config["world"]["physics_dt"], rendering_dt=scene_config["world"]["rendering_dt"])
+    world = World(blueprint["world"]["stage_units_in_meters"])
+    world.set_simulation_dt(physics_dt=blueprint["world"]["physics_dt"], rendering_dt=blueprint["world"]["rendering_dt"])
 
 
+    # Enable Isaac Sim extensions
     from isaacsim.core.utils.extensions import enable_extension
     enable_extension("isaacsim.ros2.bridge")
-    if scene_config["app"]["livestream"]:
+    if blueprint["app"]["livestream"]:
         enable_extension("omni.kit.livestream.webrtc")
 
 
-    import rclpy
+    # Create an action graph that publishes the simulation time to the /clock topic
     import omni.graph.core as og
     try:
         og.Controller.edit(
@@ -93,15 +90,15 @@ def run_sim(blueprint_path: str):
 
 
     usd_file_extensions = {".usd", ".usda"}
-
+    # Add the environment to the scene
     from isaacsim.core.utils.stage import add_reference_to_stage
-    add_reference_to_stage(usd_path=resolve_path_in_blueprint(scene_config["scene"]["environment"]["usd_path"], blueprint_path, allowed_extensions=usd_file_extensions), prim_path=scene_config["scene"]["environment"]["prim_path"])
+    add_reference_to_stage(usd_path=resolve_path_in_blueprint(blueprint["scene"]["environment"]["usd_path"], blueprint_path, allowed_extensions=usd_file_extensions), prim_path=blueprint["scene"]["environment"]["prim_path"])
 
-
+    # Add the robots to the scene
     import numpy as np
     from isaacimi.imi_robot import ImiRobot
     from isaacimi.robot_task import ImiRobotTask
-    for robot_config in scene_config["scene"]["robots"]:
+    for robot_config in blueprint["scene"]["robots"]:
         robot = ImiRobot(
             robot_config["prim_path"],
             robot_config["name"],
