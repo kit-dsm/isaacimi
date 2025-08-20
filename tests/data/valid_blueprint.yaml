@@ -1,0 +1,48 @@
+app:
+  headless: false
+  renderer: RayTracedLighting
+
+world:
+  stage_units_in_meters: 1.0
+  physics_dt: 0.0166
+  rendering_dt: 0.0166
+
+scene:
+  environment:
+    usd_path: ../../examples/environments/shapes.usd
+    prim_path: /World/environment
+  robots:
+    - name: dummy
+      usd_path: ../../examples/robots/dummy_robot.usd
+      prim_path: /World/dummy
+      position: [0, 0, 0]
+      orientation: [1, 0, 0, 0]
+      plugins:
+        - class: DummyRobotControllerPlugin
+          params:
+            twist_topic: cmd_vel
+            lift_topic: cmd_lift
+        - class: JointStatePublisherPlugin
+          params:
+            topic_name: joint_states
+        - class: RTXLidarPlugin
+          params:
+            parent_prim: /World/dummy/base_footprint/base_link/fr_lidar
+            lidar_name: front_right_lidar
+            config: SICK_tim781
+            translation: [0.1, 0, 0]
+            rotation: [1, 0, 0, 0]
+            topic_name: scan
+            frame_id: fr_lidar
+            data_type: LaserScan
+
+robot_plugins:
+  - filepath: ../../examples/plugins/dummy_robot_plugins.py
+    classes:
+      - DummyRobotControllerPlugin
+  - filepath: ../../examples/plugins/joint_state_publisher_plugin.py
+    classes:
+      - JointStatePublisherPlugin
+  - filepath: ../../examples/plugins/sensor_plugins.py
+    classes:
+      - RTXLidarPlugin
