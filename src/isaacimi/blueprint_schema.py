@@ -8,6 +8,42 @@ class BlueprintValidator(Validator):
         """
         pass
 
+    def _validate_no_duplicates(self, constraint, field, value):
+        """ Enforce no duplicate items in a list.
+
+        The rule's arguments are validated against this schema:
+        {'type': 'boolean'}
+        """
+        if not isinstance(value, list):
+            self._error(field, "'no_duplicates' rule cannot be used on a field that is not a list")
+            return
+        
+        if constraint is True and len(value) != len(set(value)):
+            self._error(field, "List must have no duplicate values.")
+
+    def _validate_unique_on(self, unique_key, field, value):
+        """ Enforce unique values for specific keys in a list of dicts.
+
+        The rule's arguments are validated against this schema:
+        {'type': 'string'}
+        """
+        if not isinstance(value, list) or not all(isinstance(item, dict) for item in value):
+            self._error(field, "'unique_on' rule cannot be used on a field that is not a list of dicts")
+            return
+
+        indexes_with_missing_key = []
+        values_at_unique_key = []
+        for idx, item in enumerate(value):
+            if unique_key not in item:
+                indexes_with_missing_key.append(idx)
+            else:
+                values_at_unique_key.append(item[unique_key])
+        
+        if indexes_with_missing_key:
+            self._error(field, f"'unique_on' rule could not be applied. The '{unique_key}' key is missing at index(es): {indexes_with_missing_key}")
+        elif len(values_at_unique_key) != len(set(values_at_unique_key)):
+            self._error(field, f"The value at '{unique_key}' must be unique for all dict items in the list")
+
 blueprint_schema = {
     "app": {
         "__description": "All settings relating to the simulation app that is launched.",
@@ -80,6 +116,7 @@ blueprint_schema = {
                 "__description": "A list of all robots that will spawn into the environment.",
                 "type": "list",
                 "required": True,
+                "unique_on": "name",
                 "schema": {
                     "type": "dict",
                     "schema": {
@@ -156,6 +193,7 @@ blueprint_schema = {
                     "type": "list",
                     "required": True,
                     'schema': {'type': 'string', 'empty': False},
+                    "no_duplicates": True
                 },
             },
         },
