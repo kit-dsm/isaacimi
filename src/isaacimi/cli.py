@@ -20,7 +20,20 @@ def run(blueprint_path):
     """
     run_sim(blueprint_path)
 
+@click.command()
+@click.argument("pytest_args", nargs=-1, type=click.UNPROCESSED)
+def test(pytest_args):
+    """Run pytest."""
+    try:
+        import pytest
+    except ImportError:
+        click.echo("The 'test' command requires additional dependencies. Please install isaacimi with:")
+        click.echo(f"    scripts/install.sh --test")
+        return
+    pytest.main(list(pytest_args))
+
 sim.add_command(run)
+cli_main.add_command(test)
 
 if __name__ == '__main__':
     cli_main(prog_name="isaacimi")

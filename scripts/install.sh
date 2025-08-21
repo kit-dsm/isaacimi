@@ -2,6 +2,37 @@
 
 set -e
 
+show_help() {
+    echo "Usage: ./install.sh [OPTIONS]"
+    echo
+    echo "Used to install isaacimi into the same Python environment as Isaac Sim."
+    echo "Requires sudo permission."
+    echo
+    echo "Options:"
+    echo "  --test      Install extras for testing."
+    echo "  --help      Show this message and exit."
+}
+
+PACKAGE_EXTRAS=()
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --help)
+            show_help
+            exit 0
+            ;;
+        --test)
+            PACKAGE_EXTRAS+=("test")
+            ;;
+        *)
+            echo "Unknown option: $1"
+            echo
+            show_help
+            exit 1
+            ;;
+    esac
+    shift
+done
+
 SCRIPTS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 ISAACIMI_DIR="$(dirname "$SCRIPTS_DIR")"
 
@@ -50,7 +81,14 @@ create_symlink() {
 isaacsim_python_exe=$(extract_isaacsim_python_exe)
 echo "[INFO] Using pip to install isaacimi into the same Python environment used by Isaac Sim..."
 echo "[INFO] Using Python interpreter: $isaacsim_python_exe"
-${isaacsim_python_exe} -m pip install -e ${ISAACIMI_DIR}
+
+if [ ${#PACKAGE_EXTRAS[@]} -eq 0 ]; then
+    ${isaacsim_python_exe} -m pip install -e ${ISAACIMI_DIR}
+else
+    PACKAGE_EXTRAS_STRING=$(IFS=, ; echo "${PACKAGE_EXTRAS[*]}")
+    echo "[INFO] Installing isaacimi with extras: [$PACKAGE_EXTRAS_STRING]"
+    ${isaacsim_python_exe} -m pip install -e ${ISAACIMI_DIR}[${PACKAGE_EXTRAS_STRING}]
+fi
 
 # TODO: setup vscode if not in Docker container
 

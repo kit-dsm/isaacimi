@@ -10,3 +10,8 @@ dependencies = [
     "cerberus",
     "click"
 ]
+
+[project.optional-dependencies]
+test = [
+    "pytest"
+]
