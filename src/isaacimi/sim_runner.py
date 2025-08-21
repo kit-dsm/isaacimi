@@ -138,3 +138,4 @@ def run_sim(blueprint_path: str):
             i += 1
 
     simulation_app.close()
+    RosManager.shutdown()
