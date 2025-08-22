@@ -36,12 +36,19 @@ class OtherClass:
 class TestLoadSubclassesFromFile:
     def test_all_classes_load_by_default(self, module_filepath):
         plugins = load_subclasses_from_file(str(module_filepath), ImiRobotPlugin)
-        assert len(plugins) == 4
+        assert len(plugins) == 4 # ensure correct number of classes were loaded
+        for name, subclass in plugins.items():
+            assert issubclass(subclass, ImiRobotPlugin) # ensure each class is a valid subclass
+            assert name == subclass.__name__ # ensure the name corresponding to each class is correct
+        assert set(plugins.keys()) == {"ChildClass1", "ChildClass2", "ChildClass3", "ChildClass4"} # ensure the classes are correct
 
     def test_allowed_classes_load(self, module_filepath):
         allowed_classes = ["ChildClass1", "ChildClass3"]
         plugins = load_subclasses_from_file(str(module_filepath), ImiRobotPlugin, allowed_classes)
         assert len(plugins) == 2
+        for name, subclass in plugins.items():
+            assert issubclass(subclass, ImiRobotPlugin)
+            assert name == subclass.__name__
         assert set(plugins.keys()) == set(allowed_classes)
     
     def test_missing_classes_raises_value_error(self, module_filepath):
