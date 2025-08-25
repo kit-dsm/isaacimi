@@ -3,6 +3,9 @@ import pytest
 import rclpy
 from rclpy.node import Node
 from rclpy.executors import MultiThreadedExecutor
+from rclpy.parameter import Parameter
+import threading
+import time
 
 @pytest.fixture(autouse=True)
 def reset_ros_manager():
@@ -53,3 +56,32 @@ def test_ros_manager_uses_different_context():
     assert robot1_node.context is RosManager._context
     assert robot2_node.context is rclpy.get_default_context()
     assert robot1_node.context is not robot2_node.context
+    rclpy.shutdown()
+
+@pytest.mark.parametrize("num_nodes", [2, 5, 10, 20])
+def test_callbacks_between_different_nodes_are_concurrent(num_nodes):
+    executions = set()
+    lock = threading.Lock()
+
+    def get_timer_callback(node_id): # need to return a callable
+        def timer_callback():
+            time.sleep(1) # blocking
+            with lock:
+                executions.add(node_id)
+        return timer_callback
+        
+    
+    for i in range(num_nodes):
+        node = RosManager.ensure_node(f"node_{i}")
+        node.create_timer(0.01, get_timer_callback(i))
+        # set use_sim_time to False for this test so we don't have to publish to the /clock topic
+        # by default it is true
+        node.set_parameters([
+            Parameter('use_sim_time', Parameter.Type.BOOL, False)
+        ])
+    
+    start_time = time.time()
+    while time.time() - start_time < 1.5: # all callbacks should finish by 1.5s if they are concurrent
+        RosManager.spin_once()
+
+    assert len(executions) == num_nodes
