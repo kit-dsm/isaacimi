@@ -10,7 +10,7 @@ def dummy_robot(simulation_app):
     dummy_robot = ImiRobot(
         "/World/robot",
         "robot",
-        str(Path.cwd() / ".." / "data" / "dummy_robot.usd"),
+        str(Path(__file__).parent / ".." / "data" / "dummy_robot.usd"),
         [0, 0, 0],
         [1, 0, 0, 0]
     )
