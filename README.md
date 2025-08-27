@@ -3,7 +3,7 @@
 [![IsaacSim](https://img.shields.io/badge/IsaacSim-4.5.0-silver.svg)](https://docs.isaacsim.omniverse.nvidia.com/latest/index.html)
 [![Python](https://img.shields.io/badge/python-3.10-blue.svg)](https://docs.python.org/3/whatsnew/3.10.html)
 
-Isaac IMI is a framework for running custom robotic simulations in Isaac Sim. Each simulation scenario is configured with a single YAML file, and customized with modular user-developed plugins. Isaac IMI is easy to use with a simple command line interface.
+Isaac IMI, originally developed for the Institute for Information Management in Engineering (IMI) at the Karlsruhe Institute of Technology (KIT), is a framework for running custom robotic simulations in Isaac Sim. Each simulation scenario is configured with a single "blueprint" YAML file, and customized with modular user-developed plugins. Isaac IMI is easy to use with a simple command line interface.
 
 ## Documentation
 The [documentation](docs/README.md) page provides everything you need to use isaacimi, including tutorials, examples, and developer guides.
@@ -87,4 +87,16 @@ robot_plugins: # define custom plugin
   - filepath: /home/user/my_simulation_project/plugins/simple_subscriber_plugin.py
     classes:
       - SimpleSubscriber
+```
+
+## Citing the project
+```bibtex
+@misc{isaacimi2025,
+author = {Chung, David and Disselnmeyer, Max and Meyer, Anne},
+title = {IsaacIMI},
+year = {2025},
+publisher = {GitHub},
+journal = {GitHub Repository},
+howpublished = {\url{https://github.com/kit-dsm/isaacimi}},
+}
 ```
