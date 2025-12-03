@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "isaacimi"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = [
+    "cerberus",
+    "click"
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest"
+]

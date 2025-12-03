@@ -1,0 +1,7 @@
+{
+  "name": "Isaac IMI",
+  "dockerComposeFile": "./compose.yaml",
+  "service": "dev",
+  "workspaceFolder": "/workspace",
+  "shutdownAction": "stopCompose"
+}

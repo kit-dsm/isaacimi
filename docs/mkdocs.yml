@@ -1,0 +1,72 @@
+site_name: isaacimi docs
+theme:
+  name: material
+  features:
+    - navigation.footer
+    - content.code.copy
+watch:
+  - ../CONTRIBUTING.md
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      default_lang: python
+  - mkdocs-click
+  - admonition
+  - pymdownx.details
+  - pymdownx.snippets:
+      base_path:
+        - !relative
+        - ../CONTRIBUTING.md
+      check_paths: true
+plugins:
+  - search  
+  - gen-files:
+      scripts:
+      - scripts/gen_api_ref_pages.py
+      - scripts/gen_schema_ref_pages.py
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: google
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            show_signature_annotations: true
+            summary: true
+            show_root_full_path: true
+            show_root_heading: true
+            parameter_headings: true
+            inherited_members: true
+            heading_level: 1
+            separate_signature: true
+  - literate-nav:
+      nav_file: SUMMARY.md
+  - section-index
+
+nav:
+  - Home: index.md
+  - Overview: overview.md
+  - Getting started:
+    - Installation:
+        - Local Installation: getting-started/local-installation.md
+        - Docker Deployment: getting-started/docker-deployment.md
+    - Preparing USD assets: getting-started/preparing-assets.md
+    - Running a simulation: getting-started/running-a-simulation.md
+    - Adding robot plugins: getting-started/adding-robot-plugins.md
+  - How-To:
+    - Add ROS dependencies to plugins: how-to/add-ros-dependencies.md
+    - Start simulations with ROS launch: how-to/start-sim-with-ros-launch.md
+  - Topic guides:
+    - Working with ROS: topic-guides/working-with-ros.md
+  - Reference:
+    - Command Line Interface: reference/cli.md
+    - Simulation blueprint: reference/simulation-blueprint.md
+    - Execution order: reference/execution-order.md
+    - API Reference: reference/api/
+  - Contributing: contribute.md

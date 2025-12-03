@@ -1,0 +1,22 @@
+# ignore .git related folders
+.git/
+.github/
+.gitignore
+
+# ignore docs
+docs/
+
+# ignore logs
+**/logs/
+**/runs/
+**/output/*
+**/outputs/*
+**/videos/*
+*.tmp
+
+# ignore __pycache__
+**/__pycache__/
+**/*.egg-info/
+
+# ignore Isaac Sim symlink
+_isaac_sim
