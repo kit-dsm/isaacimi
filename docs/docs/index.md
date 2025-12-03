@@ -1,12 +1,12 @@
 # Welcome to Isaac IMI
 
-Isaac IMI is a framework that enables researchers at the IMI to run custom, multi-robot simulations in Isaac Sim.
+Isaac IMI is a framework that enables researchers at the Institute for Information Management in Engieering (IMI) to run custom, multi-robot simulations in Isaac Sim.
 
 ## Motivation
 
 Isaac Sim, although a powerful tool, is confusing to use due to the sheer amount of features it has. For example, Isaac Sim supports three development [workflows](https://docs.isaacsim.omniverse.nvidia.com/4.5.0/introduction/workflows.html): GUI, extension, and standalone. As a result, there are many ways to accomplish the same task. To spawn a single robot into the scene and have it listen to a ROS topic, you can add the robot through the GUI and create an [omnigraph](https://docs.omniverse.nvidia.com/extensions/latest/ext_omnigraph/interface.html), do it programmatically using the extension or standalone workflow, or any combination of the three. If you do anything programatically, you may find that many approaches achieve the same result. e.g. What is the difference between a "Simulation Context" and a "World"? What is a "Task"?
 
-Even if all that seems simple, what if you now want to see how five robots interact with eachother instead of just one? You may also want to see how they interact in different environements, such as a factory or a hospital. It is a lot of manual work to create these different scenarios, and with the many ways you can accomplish the same task, the work can get inconsistent and error-prone very fast.
+Even if all that seems simple, what if you now want to see how five robots interact with eachother instead of just one? You may also want to see how they interact in different environments, such as a factory or a hospital. It is a lot of manual work to create these different scenarios, and with the many ways you can accomplish the same task, the work can get inconsistent and error-prone very fast.
 
 Finally, these problems are amplified when the project involves multiple researchers. It can be difficult for multiple people to work on the same simulation project, or for one person to continue the work of another, as the inconsistencies may lead to confusion or duplication of effort.
 

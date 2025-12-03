@@ -28,20 +28,20 @@ This tutorial will use the Clearpath Dingo robot. The `.usd` file for the robot 
 ![Clearpath Dingo robot](../assets/tutorial/clearpath_dingo.png)
 
 !!! warning
-    This `.usd` file should only contain the robot you want to spawn in the simulation. Although nothing is stopping you from doing so, do not add additional prims or logic such as action graphs to your `.usd` file. As a best practice, we recommend adding logic to your robots via [robot plugins](customization.md).
+    This `.usd` file should only contain the robot you want to spawn in the simulation. Although nothing is stopping you from doing so, do not add additional prims or logic such as action graphs to your `.usd` file. As a best practice, we recommend adding logic to your robots via [robot plugins](adding-robot-plugins.md).
 
 ## Prepare a USD for the environment you want to use in simulation 
 You can obtain a `.usd` file for the environment the same way you would for your robot.
 
 If using the Isaac Sim GUI, the Isaac Sim documentation provides some helpful guides:
 
-* [Environment Setup](https://docs.isaacsim.omniverse.nvidia.com/4.5.0/gui/tutorial_intro_environment_setup.html) - walks through how to create an environment in Isaac Sim
-* [Add Simply Objects](https://docs.isaacsim.omniverse.nvidia.com/4.5.0/gui/tutorial_intro_simple_objects.html) - walks through how to add objects to the scene
+* [Environment Setup](https://docs.isaacsim.omniverse.nvidia.com/4.5.0/gui/tutorial_intro_environment_setup.html) &ndash; walks through how to create an environment in Isaac Sim
+* [Add Simple Objects](https://docs.isaacsim.omniverse.nvidia.com/4.5.0/gui/tutorial_intro_simple_objects.html) &ndash; walks through how to add objects to the scene
 
 This tutorial will use a simple warehouse environment created with existing assets from Isaac Sim. The `.usd` file for the warehouse is located in `isaacimi/examples/environments/warehouse_two_shelves.usd`.
 
 !!! warning
-    This `.usd` file should contain only the static evironment you want to spawn your robots in. As a best practice, do not add robots or logic such as action graphs to your `.usd` file.
+    This `.usd` file should contain only the static evironment you want to spawn your robots in. Although nothing is stopping you from doing so, do not add robots or logic such as action graphs to your `.usd` file.
 
 ![Warehouse with two shelves](../assets/tutorial/warehouse_two_shelves.png)
 

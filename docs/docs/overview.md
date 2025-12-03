@@ -1,4 +1,4 @@
-Isaac IMI was designed to make it easy to run many different simulation scenarios. The goal of this page is to show how to Isaac IMI can be used to quickly get a simulation up and running, and is not intended to be a tutorial or a reference. The [Getting Started](getting-started/installation.md) tutorial covers how to run a simulation in more detail.
+Isaac IMI was designed to make it easy to run different simulation scenarios. The goal of this page is to show how to Isaac IMI can be used to quickly get a simulation up and running, and is not intended to be a tutorial or a reference. The [Getting Started](getting-started/installation.md) tutorial covers how to run a simulation in more detail.
 
 ## Create a simulation blueprint
 Create a yaml file that describes the simulation you want to run.
@@ -40,7 +40,7 @@ isaacimi sim run my_simulation_project/blueprints/evorobot_unitree_warehouse.yam
 ```
 
 ## Add your own custom plugins
-To add functionality to the robots you spawn in the simulation, you can create "robot plugins" - reusable pieces of logic run that can be run on any robot spawned in the simulation. Let's create a simple ROS subscriber plugin for the evorobots:
+To add functionality to the robots you spawn in simulation, you can create "robot plugins" &ndash; reusable pieces of logic that can be run on any robot. Let's create a simple ROS subscriber plugin for the evorobots:
 
 ``` py title="my_simulation_project/plugins/simple_subscriber_plugin.py"
 

@@ -63,7 +63,7 @@ scene:
 !!! note
     The `usd_path` setting can be an absolute path or a relative path from the simulation blueprint to the assets that you prepared in the [preparing assets](preparing-assets.md) section.
 
-These settings will spawn three robots described our `clearpath_dingo.usd` file in an environment described by our `warehouse_two_shelves.usd` file.
+These settings will spawn three robots described by our `clearpath_dingo.usd` file in an environment described by our `warehouse_two_shelves.usd` file.
 
 ## Run the simulation
 Now that you have a YAML file that describes the simulation, a `.usd` file describing the AMR, and a `.usd` file describing the warehouse that the AMRs will be spawned in, you are now ready to run the simulation. Use the following command and replace `path/to/dingo_3x_warehouse_two_shelves.yaml` with the path to your simulation blueprint:

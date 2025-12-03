@@ -21,7 +21,7 @@ If none of the plugins attached to a robot access `self.ros_node`, a ROS node wi
 ### 2. Using action graphs
 Since Isaac Sim provides action graphs with ROS functionality out of the box, you can use these action graphs in your plugins. For example, the following action graph publishes the joint states of the robot at the specified `Target Prim` to the specified `Topic Name`: ![Joint state publisher action graph in Isaac Sim](../assets/joint_state_publisher_action_graph.png)
 
-You can add this action graph to your robot by writing the following plugin:
+You can add this action graph to your robot by writing the following plugin. Note that `omni.graph.core` is part of Isaac Sim, and the syntax is documented [here](https://docs.isaacsim.omniverse.nvidia.com/4.5.0/omnigraph/omnigraph_scripting.html).
 ```python title="my_joint_state_publisher_plugin.py"
 from isaacimi.robot_plugin import ImiRobotPlugin
 import omni.graph.core as og

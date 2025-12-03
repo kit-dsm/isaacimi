@@ -27,11 +27,11 @@ world:
 
 scene:
   environment:
-    usd_path: /path/to/environment.usd # path to environment .usd file
+    usd_path: path/to/environment.usd
     prim_path: /World/environment
   robots:
     - name: robot1
-      usd_path: /path/to/robot.usd # path to robot .usd file
+      usd_path: path/to/robot.usd
       prim_path: /World/robot1
       position: [0, 0, 0]
       orientation: [1, 0, 0, 0]
@@ -39,7 +39,7 @@ scene:
 
 ### 4. Run your simulation
 ```bash
-isaacimi sim run <path/to/sim/blueprint>
+isaacimi sim run path/to/my_custom_sim.yaml
 ```
 
 ### 5. Customize your simulation with plugins
@@ -52,7 +52,7 @@ from std_msgs.msg import String
 
 class SimpleSubscriber(ImiRobotPlugin):   
     def on_plugin_load(self):
-        self.ros_node.create_subscription(String, f"{self.robot_name}/topic", self.callback, 1)
+        self.ros_node.create_subscription(String, "topic", self.callback, 1)
         self.topic_data = None
         return
 
@@ -72,11 +72,11 @@ Add your plugins to the simulation blueprint and use it across many robots:
 
 scene:
   environment:
-    usd_path: /path/to/environment.usd
+    usd_path: path/to/environment.usd
     prim_path: /World/environment
   robots:
     - name: robot1
-      usd_path: /path/to/robot.usd
+      usd_path: path/to/robot.usd
       prim_path: /World/robot1
       position: [0, 0, 0]
       orientation: [1, 0, 0, 0]
@@ -84,7 +84,7 @@ scene:
         class: SimpleSubscriber # add custom plugin
 
 robot_plugins: # define custom plugin
-  - filepath: /home/user/my_simulation_project/plugins/simple_subscriber_plugin.py
+  - filepath: path/to/my_custom_plugins.py
     classes:
       - SimpleSubscriber
 ```

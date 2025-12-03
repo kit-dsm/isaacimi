@@ -15,9 +15,9 @@ The instructions outlined in that section section will:
 4. Install the NVIDIA container toolkit to allow you to run GPU accelerated containers
 
 ## Run the container
-Clone the Isaac IMI repo on the host system:
+Clone the isaacimi repo on the host system:
 ```
-git clone https://gitlab.kit.edu/kit/imi/mairo_commons/nvidia-omniverse/isaacimi.git
+git clone https://github.com/kit-dsm/isaacimi.git
 ```
 
 A `Dockerfile` and `compose.yaml` are provided in the `isaacimi` root folder. To build the image, create the container, and start the container, run the following command in the root folder:

@@ -108,9 +108,9 @@ All joint commands (velocity, position, or effort) need to be packaged in an `Ar
 
 In the `pre_physics_step` method, we can compute the joint velocities using the `DifferentialController.forward()` method, which accepts a two element `np.ndarray` consisting of the desired linear and angular speed for our robot (i.e. the `Twist`), and outputs an `ArticulationAction` object containing joint velocities for the left and right wheel joints. As described in the Isaac Sim documentation for `ArticulationAction`, there are a few ways to populate the object. In this scenario, we will populate the object with commands for all joints on the robot. Therefore, our `ArticulationAction` object should match the number of joints on our robot.
 
-To get the number of joints on our Dingo robot, we can use the `num_dof` property on the `robot` instance, which returns the number of joints it has. We need to do this in the `initialize` method of our plugin, because that is when the robot's physics are initialized and joint information becomes available.
+To get the number of joints on our Dingo robot, we can use the `num_dof` property on the `robot` instance, which returns the number of joints it has. We need to do this in the `initialize` hook of our plugin, because that is when the robot's physics are initialized and joint information becomes available. For information about the initialization process, view the [execution order](../reference/execution-order.md) page.
 
-Additionally, when we populate the `ArticulationAction` object with our wheel velocity commands, we need to place the commands at the correct index, as each index corresponds to a specific joint. We know that name of the left and right wheel joints on the Dingo are `left_wheel_joint` and `right_wheel_joint` respectively, so we can get the index of each joint using the `robot.get_dof_index()` method.
+Additionally, when we populate the `ArticulationAction` object with our wheel velocity commands, we need to place the commands at the correct index, as each index corresponds to a specific joint. We already know that name of the left and right wheel joints on the Dingo are `left_wheel_joint` and `right_wheel_joint` respectively, so we can get the index of each joint using the `robot.get_dof_index()` method.
 
 Finally, now that we have the total number of joints on our robot, and know which index in the `ArticulationAction` object corresponds to the left and right wheel joints, we can construct our `ArticulationAction` object and apply it to the robot using the `robot.apply_action()` method.
 
@@ -230,8 +230,8 @@ class DummyRobotPlugin(ImiRobotPlugin):
         return
 ```
 
-Then, we can set the values of these paramters in the simulation blueprint:
-```yaml title="dingo_3x_warehouse_two_shelves.yaml" hl_lines="21-28 35-42 49-56"
+Then, we can set the values of these parameters in the simulation blueprint:
+```yaml title="dingo_3x_warehouse_two_shelves.yaml" hl_lines="21-27 34-40 47-53"
 app:
   headless: false
   renderer: RayTracedLighting
@@ -292,7 +292,7 @@ robot_plugins:
       - DifferentialControllerPlugin
 ```
 
-Great! Now this `DifferentialControllerPlugin` that we created can be used across any differential two-wheel robot in our simulation, we just need to tweak the params a bit in the simulation blueprint.
+Great! Now this `DifferentialControllerPlugin` that we created can be used across any differential two-wheel robot in our simulation, we just need to change the params in the simulation blueprint to match the robot.
 
 ## Summary
 You have successfully created a robot plugin that can be used on each Dingo robot in the simulation! You can now run your simulation and control each Dingo robot by publishing to ROS topics.
