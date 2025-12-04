@@ -21,8 +21,8 @@ markdown_extensions:
   - pymdownx.details
   - pymdownx.snippets:
       base_path:
-        - !relative
-        - ../CONTRIBUTING.md
+        - !relative $config_dir/..
+        - !relative $docs_dir
       check_paths: true
 plugins:
   - search  

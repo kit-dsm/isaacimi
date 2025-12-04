@@ -6,7 +6,7 @@
 Isaac IMI, originally developed for the Institute for Information Management in Engineering (IMI) at the Karlsruhe Institute of Technology (KIT), is a framework for running custom robotic simulations in Isaac Sim. Each simulation scenario is configured with a single "blueprint" YAML file, and customized with modular user-developed plugins. Isaac IMI is easy to use with a simple command line interface.
 
 ## Documentation
-The [documentation](docs/README.md) page provides everything you need to use isaacimi, including tutorials, examples, and developer guides.
+The [documentation](https://kit-dsm.github.io/isaacimi/) page provides everything you need to use isaacimi, including tutorials, examples, and developer guides.
 
 ## Example workflow
 ### 1. Prepare the `.usd` files
